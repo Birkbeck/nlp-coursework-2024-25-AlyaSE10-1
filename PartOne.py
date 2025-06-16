@@ -44,11 +44,11 @@ def read_novels(path=Path.cwd() /"p1-texts"/ "novels"):
     """Reads texts from a directory of .txt files and returns a DataFrame with the text, title,
     author, and year"""
     for file in path.glob("*.txt"):
-        print(file)
-        exit()
-        #name = file.stem.split("-")
-        #return name
-        #text = file.read_text(encoding="utf-8")
+        #print(file)
+        #exit()
+        title, author, year = file.stem.split("-")
+        print(title)
+        #text = file.read_text(encoding="utf-8")'''
     
     #pass
 
