@@ -49,7 +49,8 @@ def read_novels(path=Path.cwd() /"p1-texts"/ "novels"):
         title, author, year = file.stem.split("-")
         print(title)
         #text = file.read_text(encoding="utf-8")'''
-    
+a = read_novels()
+print(a)
     #pass
 
 
@@ -103,10 +104,10 @@ if __name__ == "__main__":
     """
     uncomment the following lines to run the functions once you have completed them
     """
-    path = Path.cwd() / "p1-texts" / "novels"
-    print(path)
-    df = read_novels(path) # this line will fail until you have completed the read_novels function above.
-    print(df.head())
+    #path = Path.cwd() / "p1-texts" / "novels"
+    #print(path)
+    #df = read_novels(path) # this line will fail until you have completed the read_novels function above.
+    #print(df.head())
     #nltk.download("cmudict")
     #parse(df)
     #print(df.head())
