@@ -41,10 +41,10 @@ def count_syl(word, d):
     pass
 
 
-def read_novels(path=Path.cwd() /"p1-texts"/ "novels"):
+def read_novels(path=Path.cwd()/"novels"):
     """Reads texts from a directory of .txt files and returns a DataFrame with the text, title,
     author, and year"""
-    print(f"Looking in: {path}")
+    #print(f"Looking in: {path}")
     data = []
     for file in path.glob("*.txt"):
         #print(file)
@@ -58,9 +58,9 @@ def read_novels(path=Path.cwd() /"p1-texts"/ "novels"):
                 "author": author.strip(),
                 "year": year
             })
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data.headers)
     return df
-    a = read_novels()
+    a = read_novels(novels_path)
     print(a)
     #pass
 
