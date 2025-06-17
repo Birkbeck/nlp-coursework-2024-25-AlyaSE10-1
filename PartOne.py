@@ -52,12 +52,14 @@ def read_novels(path=Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels"
         title, author, year = file.stem.split("-")
         #print(title)
         text = file.read_text(encoding="utf-8")
+        text_polished = text.replace('\n',' ')
         data.append({
-            "text": text,
+            "text": text_polished,
             "title": title.strip(),
             "author": author.strip(),
             "year": year})
     df = pd.DataFrame(data)
+    df = df.sort_values(by="year").reset_index(drop=True)
     return df
 a = read_novels()
 print(a)
