@@ -61,9 +61,9 @@ def read_novels(path=Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels"
     df = pd.DataFrame(data)
     df = df.sort_values(by="year").reset_index(drop=True)
     return df
-a = read_novels()
-print(a)
-    #pass
+#a = read_novels()
+#print(a)
+#    #pass
 
 
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
@@ -116,10 +116,10 @@ if __name__ == "__main__":
     """
     uncomment the following lines to run the functions once you have completed them
     """
-    #path = Path.cwd() / "p1-texts" / "novels"
-    #print(path)
-    #df = read_novels(path) # this line will fail until you have completed the read_novels function above.
-    #print(df.head())
+    path = Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") #.cwd() / "p1-texts" / "novels"
+    print(path)
+    df = read_novels(path) # this line will fail until you have completed the read_novels function above.
+    print(df.head())
     #nltk.download("cmudict")
     #parse(df)
     #print(df.head())
