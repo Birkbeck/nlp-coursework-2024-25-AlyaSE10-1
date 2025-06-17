@@ -51,9 +51,9 @@ def read_novels(path=Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels"
         #exit()
         title, author, year = file.stem.split("-")
         #print(title)
-        #text = file.read_text(encoding="utf-8")
+        text = file.read_text(encoding="utf-8")
         data.append({
-            #"text": text,
+            "text": text,
             "title": title.strip(),
             "author": author.strip(),
             "year": year})
