@@ -75,14 +75,14 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
 
 def nltk_ttr(text):
     """Calculates the type-token ratio of a text. Text is tokenized using nltk.word_tokenize."""
-    tokens = []
+    #tokens = []
     for file in path.glob("*.txt"):
+        tokens = []
         text = file.read_text(encoding="utf-8")
         tokens.extend(nltk.word_tokenize(text))
         #print(tokens)
         ttr = len(set(tokens)) / len(tokens)
-        return ttr
-#a = nltk_ttr(df)
+    return ttr
 #print(a)
     #pass
 
@@ -133,8 +133,8 @@ if __name__ == "__main__":
     #nltk.download("cmudict")
     #parse(df)
     #print(df.head())
-    #print(nltk_ttr(df)) #Alina
-    print(get_ttrs(df))
+    print(nltk_ttr(df)) #Alina
+    #print(get_ttrs(df))
     #print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     # print(adjective_counts(df))
