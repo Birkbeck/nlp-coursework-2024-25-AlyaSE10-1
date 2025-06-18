@@ -6,6 +6,7 @@ import nltk
 import spacy
 from pathlib import Path
 import pandas as pd
+nltk.download('punkt_tab')
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -63,7 +64,7 @@ def read_novels(path=Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels"
     return df
 #a = read_novels()
 #print(a)
-    pass
+   # pass
 
 
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
@@ -74,14 +75,15 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
 
 def nltk_ttr(text):
     """Calculates the type-token ratio of a text. Text is tokenized using nltk.word_tokenize."""
-    #data = []
+    tokens = []
     for file in path.glob("*.txt"):
         text = file.read_text(encoding="utf-8")
         tokens.extend(nltk.word_tokenize(text))
         print(tokens)
-text_a = str
-a = nltk_ttr(text_a)
-print(a)
+    ttr = len(set(tokens)) / len(tokens)
+    return ttr
+#a = nltk_ttr(text_a)
+#print(a)
     #pass
 
 
@@ -126,12 +128,12 @@ if __name__ == "__main__":
     """
     path = Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") #.cwd() / "p1-texts" / "novels"
     #print(path)
-    #df = read_novels(path) # this line will fail until you have completed the read_novels function above.
+    df = read_novels(path) # this line will fail until you have completed the read_novels function above.
     #print(df.head())
     #nltk.download("cmudict")
     #parse(df)
     #print(df.head())
-    #print(get_ttrs(df))
+    print(get_ttrs(df))
     #print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     # print(adjective_counts(df))
