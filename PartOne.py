@@ -79,10 +79,10 @@ def nltk_ttr(text):
     for file in path.glob("*.txt"):
         text = file.read_text(encoding="utf-8")
         tokens.extend(nltk.word_tokenize(text))
-        print(tokens)
-    ttr = len(set(tokens)) / len(tokens)
-    return ttr
-#a = nltk_ttr(text_a)
+        #print(tokens)
+        ttr = len(set(tokens)) / len(tokens)
+        return ttr
+#a = nltk_ttr(df)
 #print(a)
     #pass
 
@@ -129,10 +129,11 @@ if __name__ == "__main__":
     path = Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") #.cwd() / "p1-texts" / "novels"
     #print(path)
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
-    #print(df.head())
+    print(df.head())
     #nltk.download("cmudict")
     #parse(df)
     #print(df.head())
+    #print(nltk_ttr(df)) #Alina
     print(get_ttrs(df))
     #print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
