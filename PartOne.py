@@ -7,6 +7,7 @@ import spacy
 from pathlib import Path
 import pandas as pd
 nltk.download('punkt_tab')
+from nltk.tokenize.punkt import PunktLanguageVars
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -78,7 +79,10 @@ def nltk_ttr(text):
     tokens = []
     tokens.extend(nltk.word_tokenize(text))
         #print(tokens)
-    ttr = len(set(tokens)) / len(tokens)
+    punct_symbols = PunktLanguageVars()
+    punct_symbols_list = punct_symbols.punct_chars
+    tokens_cleaned = [token.lower() for token in tokens if token not in punct_symbols_list]
+    ttr = len(set(tokens_cleaned)) / len(tokens_cleaned)
     return ttr
 #print(a)
    #pass
@@ -129,7 +133,7 @@ if __name__ == "__main__":
     print(df.head())
     #nltk.download("cmudict")
     #parse(df)
-    print(df.head())
+    #print(df.head())
     #print(nltk_ttr(df)) #Alina
     print(get_ttrs(df))
     #print(get_fks(df))
