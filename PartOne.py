@@ -79,9 +79,10 @@ def nltk_ttr(text):
     tokens = []
     tokens.extend(nltk.word_tokenize(text))
         #print(tokens)
-    punct_symbols = PunktLanguageVars()
-    punct_symbols_list = punct_symbols.punct_chars
-    tokens_cleaned = [token.lower() for token in tokens if token not in punct_symbols_list]
+    #punct_symbols = PunktLanguageVars()
+    #punct_symbols_l = punct_symbols.punct_chars
+    tokens_cleaned = [token.lower() for token in tokens if token.isalnum()]
+    #return tokens_cleaned
     ttr = len(set(tokens_cleaned)) / len(tokens_cleaned)
     return ttr
 #print(a)
@@ -93,7 +94,10 @@ def get_ttrs(df):
     results = {}
     for i, row in df.iterrows():
         results[row["title"]] = nltk_ttr(row["text"])
-    return results
+        df["ttr"] = df["text"].apply(nltk_ttr)
+        
+    return df
+
 
 
 def get_fks(df):
