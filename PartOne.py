@@ -26,6 +26,10 @@ def fk_level(text, d):
     Returns:
         float: The Flesch-Kincaid Grade Level of the text. (higher grade is more difficult)
     """
+    word = word.lower()
+    for word in text:
+
+
     pass
 
 
@@ -40,6 +44,8 @@ def count_syl(word, d):
     Returns:
         int: The number of syllables in the word.
     """
+    word = word.lower()
+
     pass
 
 
@@ -106,6 +112,7 @@ def get_fks(df):
     cmudict = nltk.corpus.cmudict.dict()
     for i, row in df.iterrows():
         results[row["title"]] = round(fk_level(row["text"], cmudict), 4)
+        #df["fks"] = df["text"].apply(nltk_ttr)
     return results
 
 
@@ -135,12 +142,12 @@ if __name__ == "__main__":
     #print(path)
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
     print(df.head())
-    #nltk.download("cmudict")
+    nltk.download("cmudict")
     #parse(df)
     #print(df.head())
     #print(nltk_ttr(df)) #Alina
     print(get_ttrs(df))
-    #print(get_fks(df))
+    print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     # print(adjective_counts(df))
     """ 
