@@ -6,8 +6,9 @@ import nltk
 import spacy
 from pathlib import Path
 import pandas as pd
-nltk.download('punkt_tab')
-from nltk.tokenize.punkt import PunktLanguageVars
+nltk.download('punkt')
+#from nltk.tokenize.punkt import PunktLanguageVars
+
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -26,11 +27,15 @@ def fk_level(text, d):
     Returns:
         float: The Flesch-Kincaid Grade Level of the text. (higher grade is more difficult)
     """
-    #word = word.lower()
-    #for word in text:
-
-
-    pass
+    tokens = []
+    sentences = sent_tokenize(text)
+    total_sentences = len(sentences)
+    tokens.extend(nltk.word_tokenize(text))
+    tokens_cleaned = [token.lower() for token in tokens if token.isalnum()]
+    total_words = len(tokens_cleaned)
+    total_syllables = sum (count_syl(token,d) for token in tokens_cleaned) 
+    fk_grade = 0.39 * (total_words/total_sentences) + 11.8 * (total_syllables/total_words) - 15.59
+    #pass
 
 
 def count_syl(word, d):
@@ -42,8 +47,7 @@ def count_syl(word, d):
         d (dict): A dictionary of syllables per word.
 
     Returns:
-        int: The number of syllables in the word.
-    """
+        int: The number of syllables in the word."""
     d = {}
     vowels =  "aeiouy"
     i = 0
