@@ -7,6 +7,7 @@ import spacy
 from pathlib import Path
 import pandas as pd
 nltk.download('punkt')
+from nltk.tokenize import word_tokenize, sent_tokenize
 #from nltk.tokenize.punkt import PunktLanguageVars
 
 
@@ -27,6 +28,7 @@ def fk_level(text, d):
     Returns:
         float: The Flesch-Kincaid Grade Level of the text. (higher grade is more difficult)
     """
+    cmudict = nltk.corpus.cmudict.dict()
     tokens = []
     sentences = sent_tokenize(text)
     total_sentences = len(sentences)
@@ -35,6 +37,7 @@ def fk_level(text, d):
     total_words = len(tokens_cleaned)
     total_syllables = sum (count_syl(token,d) for token in tokens_cleaned) 
     fk_grade = 0.39 * (total_words/total_sentences) + 11.8 * (total_syllables/total_words) - 15.59
+    return fk_grade
     #pass
 
 
@@ -114,23 +117,26 @@ def nltk_ttr(text):
 
 def get_ttrs(df):
     """helper function to add ttr to a dataframe"""
-    results = {}
-    for i, row in df.iterrows():
-        results[row["title"]] = nltk_ttr(row["text"])
-        df["ttr"] = df["text"].apply(nltk_ttr)
-        
+    #results = {}
+    #for i, row in df.iterrows():
+    #    results[row["title"]] = nltk_ttr(row["text"])
+    df["ttr"] = df["text"].apply(nltk_ttr) 
     return df
 
 
 
 def get_fks(df):
     """helper function to add fk scores to a dataframe"""
-    results = {}
+    #results = {}
+    #fks_grade = []
     cmudict = nltk.corpus.cmudict.dict()
-    for i, row in df.iterrows():
-        results[row["title"]] = round(fk_level(row["text"], cmudict), 4)
-        #df["fks"] = df["text"].apply(nltk_ttr)
-    return results
+    #for i, row in df.iterrows():
+        #results[row["title"]] = round(fk_level(row["text"], cmudict), 4)
+        #title = row["title"]
+        #fks = round(fk_level(row["text"], cmudict), 4)
+        #fks_grade.append(fks) 
+    df["fks"] = df["text"].apply(lambda text: round(fk_level(text, cmudict), 4))
+    return df
 
 
 def subjects_by_verb_pmi(doc, target_verb):
@@ -158,7 +164,7 @@ if __name__ == "__main__":
     path = Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") #.cwd() / "p1-texts" / "novels"
     #print(path)
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
-    print(df.head())
+    #print(df.head())
     nltk.download("cmudict")
     #parse(df)
     #print(df.head())
