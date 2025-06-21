@@ -69,7 +69,7 @@ def count_syl(word, d):
     #pass
 
 
-def read_novels(path=Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels")):
+def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
     """Reads texts from a directory of .txt files and returns a DataFrame with the text, title,
     author, and year"""
     #print(f"Looking in: {path}")
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     """
     uncomment the following lines to run the functions once you have completed them
     """
-    path = Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") #.cwd() / "p1-texts" / "novels"
+    path = Path.cwd() / "p1-texts" / "novels" #(/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") 
     #print(path)
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
     #print(df.head())
