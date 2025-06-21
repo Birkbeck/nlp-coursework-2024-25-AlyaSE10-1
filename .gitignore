@@ -1,6 +1,8 @@
 # ignore the texts to avoid large github upload. PN
 p1-texts/novels/
 p2-texts/
+#ignore pickle files
+*.pkl
 
 
 # Byte-compiled / optimized / DLL files
