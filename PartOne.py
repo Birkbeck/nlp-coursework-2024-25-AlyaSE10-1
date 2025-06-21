@@ -97,7 +97,8 @@ def read_novels(path=Path("/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels"
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""
-    pass
+    df["doc"] = df["text"].apply(nlp)
+    #pass
 
 
 def nltk_ttr(text):
