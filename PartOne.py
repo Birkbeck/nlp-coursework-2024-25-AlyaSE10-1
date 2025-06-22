@@ -163,13 +163,14 @@ def subjects_by_verb_pmi(doc, target_verb):
     corpus_size = len(doc)
     #using function subject_be_verb_count for receiving list of subjects
     subjects = subjects_by_verb_count(doc,target_verb)
-    subjects_ind = []
+    #print(subjects)
+    #subjects_ind = []
     #calculating independing probability per word
-    for token in doc:
+    '''for token in doc:
         if token in subjects:
-            subjects_ind.append
+            subjects_ind.append(token.text.lower())
         #prob_subj == sub_ind_counter/corpus_size
-    print(subjects_ind) 
+       #print(subjects_ind)'''
 
 
 
