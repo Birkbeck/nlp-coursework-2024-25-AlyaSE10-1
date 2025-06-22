@@ -155,8 +155,24 @@ def get_fks(df):
 
 
 def subjects_by_verb_pmi(doc, target_verb):
-    """Extracts the most common subjects of a given verb in a parsed document. Returns a list."""
-    pass
+    """Extracts the most common subjects of a given verb in a parsed document. Returns a list.
+    Calculating PMI using formula I(x, y) = log2 (P(x,y)/ P(x)P(y) where P(x,y) is joint probability when hear and subject is in novel together and P(x) and P(y) are independent probabilities"""
+    sub_ind_counter = Counter()
+    verb_ind_counter = Counter()
+    pair_counter = Counter()
+    corpus_size = len(doc)
+    #using function subject_be_verb_count for receiving list of subjects
+    subjects = subjects_by_verb_count(doc,target_verb)
+    subjects_ind = []
+    #calculating independing probability per word
+    for token in doc:
+        if token in subjects:
+            subjects_ind.append
+        #prob_subj == sub_ind_counter/corpus_size
+    print(subjects_ind) 
+
+
+
 
 
 
@@ -233,12 +249,12 @@ if __name__ == "__main__":
         print(row["title"])
         print(subjects_by_verb_count(row["parsed"], "hear"))
         print("\n")
-    """
+    
     for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_pmi(row["parsed"], "hear"))
         print("\n")
-    """
+
     for i, row in df.iterrows():
         print(row["title"])
         print(syntactic_objects(row["parsed"]))
