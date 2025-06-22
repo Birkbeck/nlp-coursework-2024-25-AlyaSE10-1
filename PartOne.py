@@ -99,14 +99,14 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""
     df["tokens_spacy"] = df["text"].apply(nlp)
-    if len("token_spacy") >nlp.max_length:
+    '''if len("token_spacy") > nlp.max_length:
         chunks = ["token_spacy"[i:i+nlp.max_length] for i in range(0,len("token_spacy"), nlp.max_length)]
         docs = [nlp(chunk) for chunk in chunks]
         return docs
     else:
-        return ["token_spacy"]
+        return ["token_spacy"]'''
         
-    #return df
+    return df
     #df.to_pickle("dataframe_parsed.pkl")
 
 
@@ -167,12 +167,22 @@ def subjects_by_verb_count(doc, verb):
 
 def adjective_counts(doc):
     """Extracts the most common adjectives in a parsed document. Returns a list of tuples."""
-    syntactic_obj = Counter()
-    for doc in df["tokens_spacy"]:
-        syntactic_obj.update([token.dep_ for token in "tokens_spacy" if token.dep_ != " "])
-        ten_syntatic_obj = syntactic_obj.most_common(10)
-        titles = df['title'].tolist()
-    print("")
+    
+    title_syn_obj = {}
+    for i in range(len(df)):
+        #syntactic_obj.update([token.dep_ for token in "tokens_spacy" if token.dep_ != " "])
+        #ten_syntatic_obj = syntactic_obj.most_common(10)
+        title = df['title']
+        tokens = df['tokens_parsed']
+        syn_obj_counter = Counter()
+        for token in tokens:
+            if token.dep_:
+                syn_obj_counter[token.dep_] += 1
+        syn_obj = [dep for dep, count in syn_obj_counter.most_common(10)]
+        title_syn_obj[title] = syn_obj
+    
+    for title, deps in  title_syn_obj():
+       print(f"{title}:{deps}")
 
 
 
@@ -187,12 +197,12 @@ if __name__ == "__main__":
     #print(df.head())
     nltk.download("cmudict")
     parse(df)
-    print(df.head())
+    #print(df.head())
     #print(nltk_ttr(df)) #Alina
-    print(get_ttrs(df))
-    print(get_fks(df))
+    #print(get_ttrs(df))
+    #print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
-    # print(adjective_counts(df))
+    #print(adjective_counts(df))
     """ 
     for i, row in df.iterrows():
         print(row["title"])
