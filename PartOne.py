@@ -166,10 +166,11 @@ def subjects_by_verb_count(doc, verb):
 
 
 
-def syntactic_counts(doc):
+def syntactic_objects(doc):
     """Extracts the most common adjectives in a parsed document. Returns a list of tuples."""
     
-    title_syn_obj = {}
+    #title_syn_obj = {}
+    syn_obj_l = ["dobj", "podj", "iobj"]
     #for i in range(len(df)):
         #syntactic_obj.update([token.dep_ for token in "tokens_spacy" if token.dep_ != " "])
         #ten_syntatic_obj = syntactic_obj.most_common(10)
@@ -177,9 +178,9 @@ def syntactic_counts(doc):
         #tokens = df['tokens_parsed']
     syn_obj_counter = Counter()
     for token in doc:
-        if token.dep_:
-            syn_obj_counter[token.dep_] += 1
-    syn_obj = [dep for dep, count in syn_obj_counter.most_common(10)]
+        if token.dep_ in syn_obj_l:
+            syn_obj_counter[token.text.lower()] += 1
+    syn_obj = [word for word, count in syn_obj_counter.most_common(10)]
             #title_syn_obj[title] = syn_obj
     return syn_obj
     
@@ -218,7 +219,7 @@ if __name__ == "__main__":
     """
     for i, row in df.iterrows():
         print(row["title"])
-        print(syntactic_counts(row["parsed"]))
+        print(syntactic_objects(row["parsed"]))
         print("\n")
 
 
