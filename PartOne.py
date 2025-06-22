@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize, sent_tokenize
+from collections import Counter
 #from nltk.tokenize.punkt import PunktLanguageVars
 
 
@@ -98,7 +99,14 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""
     df["tokens_spacy"] = df["text"].apply(nlp)
-    return df
+    if len("token_spacy") >nlp.max_length:
+        chunks = ["token_spacy"[i:i+nlp.max_length] for i in range(0,len("token_spacy"), nlp.max_length)]
+        docs = [nlp(chunk) for chunk in chunks]
+        return docs
+    else:
+        return ["token_spacy"]
+        
+    #return df
     #df.to_pickle("dataframe_parsed.pkl")
 
 
@@ -141,6 +149,7 @@ def get_fks(df):
         #fks = round(fk_level(row["text"], cmudict), 4)
         #fks_grade.append(fks) 
     df["fks"] = df["text"].apply(lambda text: round(fk_level(text, cmudict), 4))
+    
     return df
 
 
@@ -158,7 +167,13 @@ def subjects_by_verb_count(doc, verb):
 
 def adjective_counts(doc):
     """Extracts the most common adjectives in a parsed document. Returns a list of tuples."""
-    pass
+    syntactic_obj = Counter()
+    for doc in df["tokens_spacy"]:
+        syntactic_obj.update([token.dep_ for token in "tokens_spacy" if token.dep_ != " "])
+        ten_syntatic_obj = syntactic_obj.most_common(10)
+        titles = df['title'].tolist()
+    print("")
+
 
 
 
@@ -189,4 +204,5 @@ if __name__ == "__main__":
         print(subjects_by_verb_pmi(row["parsed"], "hear"))
         print("\n")
     """
+
 
