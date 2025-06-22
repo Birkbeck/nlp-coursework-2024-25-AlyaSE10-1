@@ -181,6 +181,10 @@ def syntactic_objects(doc):
         if token.dep_ in syn_obj_l:
             syn_obj_counter[token.text.lower()] += 1
     syn_obj = [word for word, count in syn_obj_counter.most_common(10)]
+
+    #print(syn_obj) 
+    #for token in syn_obj:
+    #    print(f"{token.text} - {token.dep_}")
             #title_syn_obj[title] = syn_obj
     return syn_obj
     
