@@ -98,6 +98,7 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""
     df["tokens_spacy"] = df["text"].apply(nlp)
+    return df
     #df.to_pickle("dataframe_parsed.pkl")
 
 
@@ -170,8 +171,8 @@ if __name__ == "__main__":
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
     #print(df.head())
     nltk.download("cmudict")
-    #parse(df)
-    #print(df.head())
+    parse(df)
+    print(df.head())
     #print(nltk_ttr(df)) #Alina
     print(get_ttrs(df))
     print(get_fks(df))
