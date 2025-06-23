@@ -161,7 +161,7 @@ def subjects_by_verb_pmi(doc, target_verb):
     sub_ind_counter = Counter()
     sub_verb_counter = Counter() #P(x,y)
     verb_ind_counter = 0
-    pair_counter = Counter()
+    pair_counter = 0
     corpus_size = len(doc)
     checking_dictionary = {} 
     #using function subject_be_verb_count for receiving list of subjects
@@ -172,19 +172,23 @@ def subjects_by_verb_pmi(doc, target_verb):
     for token in doc:
         if token.lemma_ == target_verb and token.pos_ == "VERB":
             verb_ind_counter +=1
-            for child in syn_subj_l:
-                subj = child.text.lower()
-                sub_verb_counter +=1 #subject for this verb
-                pair_counter +=1 #both subject and 
+            for child in token.children:
+                if child.dep_ in syn_subj_l:
+                    subj = child.text.lower()
+                    sub_verb_counter[subj] +=1 #subject for this verb
+                    pair_counter +=1 #both subject and 
+                    #print(pair_counter)
         #calculate number of the syntactiv objects when hear is not a target. I chose to still calculate the number only if the words are syntactic objects because this approach is analyzing syntactic patterns
         elif token.pos_ == "VERB":
             for child in token.children:
                 if child.dep_ in syn_subj_l:
                     subj = child.text.lower()
                     sub_ind_counter[subj] += 1
+                    print(subj)
+
 
     #Computing probabilities. I decided to use cooccurance (pair counter) in order to focus on measurement how strong subject and verb are associated. I also could use the whole corpus (cleaned one) as we have in Jurafsky, chapter 6 but this approach will use many itrelevant tokens so I chose pairs 
-        pmi_scores = {}
+        '''pmi_scores = {}
         for subj in sub_verb_counter:
             prob_sv = sub_verb_counter[subj]/pair_counter
             prob_s = sub_ind_counter[subj]/pair_counter
@@ -192,7 +196,7 @@ def subjects_by_verb_pmi(doc, target_verb):
             pmi = log2(prob_sv/(prob_s*prob_v))
             pmi_scores[subj] = pmi
     print(checking_dictionary = {subj:pmi} )
-            #print(subj)
+            #print(subj)'''
 
         
 
@@ -265,8 +269,8 @@ if __name__ == "__main__":
     parse(df)
     #print(df.head())
     #print(nltk_ttr(df)) #Alina
-    print(get_ttrs(df))
-    print(get_fks(df))
+    #print(get_ttrs(df))
+    #print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     #print(adjective_counts(df))
     
