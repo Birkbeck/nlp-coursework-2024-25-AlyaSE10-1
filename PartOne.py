@@ -168,7 +168,7 @@ def subjects_by_verb_pmi(doc, target_verb):
     syn_subj_options = ["nsubj", "nsubjpass"]
     syn_subj_l = subjects_by_verb_count(doc, target_verb)
     #print(syn_subj_l)
-    #subjects_ind = []
+    
     #calculating independing probability per word
     for token in doc:
         if token.lemma_ == target_verb and token.pos_ == "VERB":
@@ -185,19 +185,23 @@ def subjects_by_verb_pmi(doc, target_verb):
                 if child.text in syn_subj_l and child.dep_ in syn_subj_options:
                     subj = child.text.lower()
                     sub_ind_counter[subj] += 1
-                    print(subj)
+                    #print(subj)
 
 
     #Computing probabilities. I decided to use cooccurance (pair counter) in order to focus on measurement how strong subject and verb are associated. I also could use the whole corpus (cleaned one) as we have in Jurafsky, chapter 6 but this approach will use many itrelevant tokens so I chose pairs 
-        '''pmi_scores = {}
-        for subj in sub_verb_counter:
-            prob_sv = sub_verb_counter[subj]/pair_counter
-            prob_s = sub_ind_counter[subj]/pair_counter
-            prob_v = verb_ind_counter/pair_counter
-            pmi = log2(prob_sv/(prob_s*prob_v))
-            pmi_scores[subj] = pmi
-    print(checking_dictionary = {subj:pmi} )
-            #print(subj)'''
+    pmi_scores = {}
+    for subj in sub_verb_counter:
+        prob_sv = sub_verb_counter[subj]/pair_counter
+        prob_s = sub_ind_counter[subj]/pair_counter
+        prob_v = verb_ind_counter/pair_counter
+        pmi = log2(prob_sv/(prob_s*prob_v))
+        pmi_scores[subj] = pmi
+    #sorting the subjects by PMI (the subject with the highest PMI  will be the first)
+    sorted_subj_pmi = sorted(pmi_scores.items(), key=lambda x:x[1], reverse=True)
+    #testing that we have decreasing frequency
+    #print(sorted_subj_pmi[:10])
+
+    #In the test 2 novels (A_Tale_of_Two_Cities, Blood_Meridian) we receive negative PMI this means that subject appear independently more frequently then together
 
         
 
