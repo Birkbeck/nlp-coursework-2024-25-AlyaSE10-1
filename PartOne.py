@@ -159,14 +159,21 @@ def subjects_by_verb_pmi(doc, target_verb):
     """Extracts the most common subjects of a given verb in a parsed document. Returns a list.
     Calculating PMI using formula I(x, y) = log2 (P(x,y)/ P(x)P(y) where P(x,y) is joint probability when hear and subject is in novel together and P(x) and P(y) are independent probabilities"""
     sub_ind_counter = Counter()
-    sub_verb_counter = Counter() #P(x,y)
+    sub_verb_counter = Counter() 
     verb_ind_counter = 0
     pair_counter = 0
     corpus_size = len(doc)
     checking_list= []
-    #using function subject_be_verb_count for receiving list of subjects
+    #finding all subjects for the verb
     syn_subj_options = ["nsubj", "nsubjpass"]
-    syn_subj_l = subjects_by_verb_count(doc, target_verb)
+    syn_subj_l = []
+    for token in doc:
+        if token.lemma_ == target_verb and token.pos_ == "VERB":
+            for child in token.children:
+                if child.dep_ in syn_subj_options:
+                    syn_subj_l.append(child.text)               
+    syn_subj_l_final = syn_subj_l
+    #syn_subj_l = list(syn_subj_set)
     #print(syn_subj_l)
     
     #calculating independing probability per word
@@ -174,35 +181,42 @@ def subjects_by_verb_pmi(doc, target_verb):
         if token.lemma_ == target_verb and token.pos_ == "VERB":
             verb_ind_counter +=1
             for child in token.children:
-                if child.text in syn_subj_l:
+                if child.text in syn_subj_l_final:
                     subj = child.text.lower()
                     sub_verb_counter[subj] +=1 #subject for this verb
-                    pair_counter +=1 #both subject and 
-                    #print(subj)
+                    pair_counter +=1 #both subject and verb
+                    #print(pair_counter)
         #calculate number of the syntactiv objects when hear is not a target. I chose to still calculate the number only if the words are syntactic objects because this approach is analyzing syntactic patterns
         elif token.pos_ == "VERB":
             for child in token.children:
-                if child.text in syn_subj_l and child.dep_ in syn_subj_options:
-                    subj = child.text.lower()
-                    sub_ind_counter[subj] += 1
-                    #print(subj)
+                if child.text in syn_subj_l_final:
+                    if child.dep_ in syn_subj_options:
+                        subj = child.text.lower()
+                        sub_ind_counter[subj] += 1
+                    #print(sub_ind_counter)
 
 
     #Computing probabilities. I decided to use cooccurance (pair counter) in order to focus on measurement how strong subject and verb are associated. I also could use the whole corpus (cleaned one) as we have in Jurafsky, chapter 6 but this approach will use many itrelevant tokens so I chose pairs 
     pmi_scores = {}
+    if pair_counter == 0 or verb_ind_counter == 0:
+        return []
     for subj in sub_verb_counter:
         prob_sv = sub_verb_counter[subj]/pair_counter
         prob_s = sub_ind_counter[subj]/pair_counter
         prob_v = verb_ind_counter/pair_counter
-        pmi = log2(prob_sv/(prob_s*prob_v))
+        #print(prob_v)
+        if prob_sv == 0 or prob_s == 0 or prob_v == 0:
+            continue 
+        pmi = log2(prob_sv/(prob_s * prob_v))
+        #print(pmi)
         pmi_scores[subj] = pmi
     #sorting the subjects by PMI (the subject with the highest PMI  will be the first)
     sorted_subj_pmi = sorted(pmi_scores.items(), key=lambda x:x[1], reverse=True)
-    #testing that we have decreasing frequency
-    #print(sorted_subj_pmi[:10])
+    #testing that we have decreasing PMI
+    print(sorted_subj_pmi[:10])
 
     #In the test 2 novels (A_Tale_of_Two_Cities, Blood_Meridian) we receive negative PMI this means that subject appear independently more frequently then together
-
+    return [subject for subject, count in sorted_subj_pmi[:10]]
         
 
 
