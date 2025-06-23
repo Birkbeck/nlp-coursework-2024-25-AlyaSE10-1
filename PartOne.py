@@ -165,7 +165,7 @@ def subjects_by_verb_pmi(doc, target_verb):
     corpus_size = len(doc)
     checking_list= []
     #using function subject_be_verb_count for receiving list of subjects
-    #syn_subj_l = ["nsubj", "nsubjpass"]
+    syn_subj_options = ["nsubj", "nsubjpass"]
     syn_subj_l = subjects_by_verb_count(doc, target_verb)
     #print(syn_subj_l)
     #subjects_ind = []
@@ -182,7 +182,7 @@ def subjects_by_verb_pmi(doc, target_verb):
         #calculate number of the syntactiv objects when hear is not a target. I chose to still calculate the number only if the words are syntactic objects because this approach is analyzing syntactic patterns
         elif token.pos_ == "VERB":
             for child in token.children:
-                if child.text in syn_subj_l:
+                if child.text in syn_subj_l and child.dep_ in syn_subj_options:
                     subj = child.text.lower()
                     sub_ind_counter[subj] += 1
                     print(subj)
