@@ -213,9 +213,13 @@ def subjects_by_verb_pmi(doc, target_verb):
     #sorting the subjects by PMI (the subject with the highest PMI  will be the first)
     sorted_subj_pmi = sorted(pmi_scores.items(), key=lambda x:x[1], reverse=True)
     #testing that we have decreasing PMI
-    print(sorted_subj_pmi[:10])
+    #print(sorted_subj_pmi[:10])
 
-    #In the test 2 novels (A_Tale_of_Two_Cities, Blood_Meridian) we receive negative PMI this means that subject appear independently more frequently then together
+    '''In the test 2 novels (A_Tale_of_Two_Cities, Blood_Meridian) we receive negative PMI this means that subject appear independently more frequently then together.
+   List from function subject_by_verb_count should is different from the generated list from this functions. Some subjects are frequently appeared - 
+   these are I, he, you, she etc, they are generally used. They PMI is dramatically dropping because they are used without verb more frequently. As a result the "leaders" 
+   in PMI are less general words
+   For example word "nobody" in Blood Meridian is the last by frequency in the top10 because it is not that general but it is the leader by PMI because it stronger associated with verb "hear" we have it not that often like "he" - leader in frequency for this novel''' 
     return [subject for subject, count in sorted_subj_pmi[:10]]
         
 
