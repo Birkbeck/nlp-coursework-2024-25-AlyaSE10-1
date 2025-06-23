@@ -163,25 +163,26 @@ def subjects_by_verb_pmi(doc, target_verb):
     verb_ind_counter = 0
     pair_counter = 0
     corpus_size = len(doc)
-    checking_dictionary = {} 
+    checking_list= []
     #using function subject_be_verb_count for receiving list of subjects
-    syn_subj_l = ["nsubj", "nsubjpass"]
-    #print(subjects)
+    #syn_subj_l = ["nsubj", "nsubjpass"]
+    syn_subj_l = subjects_by_verb_count(doc, target_verb)
+    #print(syn_subj_l)
     #subjects_ind = []
     #calculating independing probability per word
     for token in doc:
         if token.lemma_ == target_verb and token.pos_ == "VERB":
             verb_ind_counter +=1
             for child in token.children:
-                if child.dep_ in syn_subj_l:
+                if child.text in syn_subj_l:
                     subj = child.text.lower()
                     sub_verb_counter[subj] +=1 #subject for this verb
                     pair_counter +=1 #both subject and 
-                    #print(pair_counter)
+                    #print(subj)
         #calculate number of the syntactiv objects when hear is not a target. I chose to still calculate the number only if the words are syntactic objects because this approach is analyzing syntactic patterns
         elif token.pos_ == "VERB":
             for child in token.children:
-                if child.dep_ in syn_subj_l:
+                if child.text in syn_subj_l:
                     subj = child.text.lower()
                     sub_ind_counter[subj] += 1
                     print(subj)
@@ -274,10 +275,10 @@ if __name__ == "__main__":
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     #print(adjective_counts(df))
     
-    '''for i, row in df.iterrows():
+    for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_count(row["parsed"], "hear"))
-        print("\n")'''
+        print("\n")
     
     for i, row in df.iterrows():
         print(row["title"])
