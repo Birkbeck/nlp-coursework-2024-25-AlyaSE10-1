@@ -29,11 +29,12 @@ print(top4_party_names)
 top4_df = df[df["party"].isin(top4_party_names.index)]
 num_rows = top4_df.shape[0]
 print(num_rows)
-'''
+
 #removing value, rows will stay,  replacing with "" 
-top4_df["party"] = df["party"].replace({"Speaker":""}) 
+top4_df.loc[top4_df["party"] == "Speaker", "party"] = ""
+
 num_rows = top4_df.shape[0]
-print(num_rows)'''
+print(num_rows)
 
 
 
