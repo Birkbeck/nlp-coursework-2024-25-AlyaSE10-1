@@ -9,6 +9,7 @@ import pandas as pd
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize, sent_tokenize
 from collections import Counter
+from math import log2
 #from nltk.tokenize.punkt import PunktLanguageVars
 
 
@@ -158,19 +159,42 @@ def subjects_by_verb_pmi(doc, target_verb):
     """Extracts the most common subjects of a given verb in a parsed document. Returns a list.
     Calculating PMI using formula I(x, y) = log2 (P(x,y)/ P(x)P(y) where P(x,y) is joint probability when hear and subject is in novel together and P(x) and P(y) are independent probabilities"""
     sub_ind_counter = Counter()
-    verb_ind_counter = Counter()
+    sub_verb_counter = Counter() #P(x,y)
+    verb_ind_counter = 0
     pair_counter = Counter()
     corpus_size = len(doc)
+    checking_dictionary = {} 
     #using function subject_be_verb_count for receiving list of subjects
-    subjects = subjects_by_verb_count(doc,target_verb)
+    syn_subj_l = ["nsubj", "nsubjpass"]
     #print(subjects)
     #subjects_ind = []
     #calculating independing probability per word
-    '''for token in doc:
-        if token in subjects:
-            subjects_ind.append(token.text.lower())
-        #prob_subj == sub_ind_counter/corpus_size
-       #print(subjects_ind)'''
+    for token in doc:
+        if token.lemma_ == target_verb and token.pos_ == "VERB":
+            verb_ind_counter +=1
+            for child in syn_subj_l:
+                subj = child.text.lower()
+                sub_verb_counter +=1 #subject for this verb
+                pair_counter +=1 #both subject and 
+        #calculate number of the syntactiv objects when hear is not a target. I chose to still calculate the number only if the words are syntactic objects because this approach is analyzing syntactic patterns
+        elif token.pos_ == "VERB":
+            for child in token.children:
+                if child.dep_ in syn_subj_l:
+                    subj = child.text.lower()
+                    sub_ind_counter[subj] += 1
+
+    #Computing probabilities. I decided to use cooccurance (pair counter) in order to focus on measurement how strong subject and verb are associated. I also could use the whole corpus (cleaned one) as we have in Jurafsky, chapter 6 but this approach will use many itrelevant tokens so I chose pairs 
+        pmi_scores = {}
+        for subj in sub_verb_counter:
+            prob_sv = sub_verb_counter[subj]/pair_counter
+            prob_s = sub_ind_counter[subj]/pair_counter
+            prob_v = verb_ind_counter/pair_counter
+            pmi = log2(prob_sv/(prob_s*prob_v))
+            pmi_scores[subj] = pmi
+    print(checking_dictionary = {subj:pmi} )
+            #print(subj)
+
+        
 
 
 
@@ -246,19 +270,19 @@ if __name__ == "__main__":
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     #print(adjective_counts(df))
     
-    for i, row in df.iterrows():
+    '''for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_count(row["parsed"], "hear"))
-        print("\n")
+        print("\n")'''
     
     for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_pmi(row["parsed"], "hear"))
         print("\n")
 
-    for i, row in df.iterrows():
+    '''for i, row in df.iterrows():
         print(row["title"])
         print(syntactic_objects(row["parsed"]))
-        print("\n")
+        print("\n")'''
 
 
