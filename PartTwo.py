@@ -19,23 +19,23 @@ filtered = df[df["party"] == 'Labour (Co-op)']
 #num_rows = filtered.shape[0]
 #print(num_rows)
 
-#rename the ‘Labour (Co-op)’ value in ‘party’ column to ‘Labour’
+#rename the ‘Labour (Co-op)’ value in ‘party’ column to ‘Labour’. Merging observation with the same party name
 df["party"] = df["party"].replace({"Labour (Co-op)":"Labour"}) 
-#checking number of rows after replacment - received 0 rows using "Labour (Co-op)". The function is ready to commit
-#filtered = df[df["party"] == 'Labour']
+
 #num_rows = filtered.shape[0]
-#print(num_rows)
+#print(df.shape)
 
 #a(ii)
 #removing value Speaker before finding the top4. As I am preparing the dataset for further training and "party" column will be my target, value Speaker is not a party name, So it is a missing value. I clean only value not rows
-df["party"] == df["party"].replace({"Speaker": ""})
+df["party"] = df["party"].replace("Speaker",' ')
+#print(df.shape)
+filtered = df[df["party"]== "Speaker"]
+print(filtered.shape)
 #Now when I cleaned not relevant Speaker I am searching for top 4 party names that I will predict on a future steps of the task. By default value_counts will ignore the NA "party" value.  
-df = df["party"].value_counts().head(4)
-#print(top4_party_names)
-
-num_rows = df.shape[0]
-#print(num_rows)
-
+top4 = df["party"].value_counts(dropna=True).head(4)
+print(top4)
+df_top4 =  df[df["party"].isin(top4)]
+print(df_top4.shape)
 
 #I will use column 'speech" for predicting the party name. That is why on this step I remove any rows where the value in the ‘speech_class’ column is not ‘Speech’, so has not relevant data
 df = df[df["speech_class"] == 'Speech']
@@ -44,8 +44,8 @@ print(df)
 #For detecting nessesary features I need a long text, there is no nesessary information in small speech. That is why I remove any rows where the text in the ‘speech’ column is less than 1000 characters long
 df_prepared = df[df['speech'].str.len() >=1000]
 #Checking my final dataframe. This is my prepared dataset with information about 4 classes where I have enough information for orediction. Dataset is still not balanced but I get rid off parties with extremely small number of observation 
-print(df_prepared)
-
+print(df_prepared.shape)
+'''
 #b
 #1.Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
 3000.
@@ -75,7 +75,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. 
 #Training base on training data and then predict using test observations (X_test)
 print(y_train.value_counts())
-'''random_f= RandomForestClassifier(n_estimators=300, random_state=26)
+random_f= RandomForestClassifier(n_estimators=300, random_state=26)
 random_f.fit(X_train,y_train)
 y_pred_random_f = random_f.predict(X_test)
 #2.Train SVM with linear kernel
