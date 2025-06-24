@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, f1_score
 
-#loading data from csv file
+#loading data from csv file.The df is the source for our next tasks
 with open("p2-texts /hansard40000.csv", mode="r",encoding='utf-8') as file:
     df=pd.read_csv(file,header=0)
 
@@ -18,8 +18,10 @@ filtered = df[df["party"] == 'Labour (Co-op)']
 #print(filtered)
 #num_rows = filtered.shape[0]
 #print(num_rows)
+#work with a copy of df so the intial df will stay as it is for next tasks in the assignment
+df_for_a= df.copy()
 #rename the ‘Labour (Co-op)’ value in ‘party’ column to ‘Labour’
-df["party"] = df["party"].replace({"Labour (Co-op)":"Labour"}) 
+df_for_a["party"] = df_for_a["party"].replace({"Labour (Co-op)":"Labour"}) 
 #checking number of rows after replacment - received 0 rows using "Labour (Co-op)". The function is ready to commit
 #filtered = df[df["party"] == 'Labour']
 #num_rows = filtered.shape[0]
@@ -27,15 +29,16 @@ df["party"] = df["party"].replace({"Labour (Co-op)":"Labour"})
 
 #a(ii)
 #Searching four most common party names(verified against test Excel)
-top4_party_names = df["party"].value_counts().head(4)
+top4_party_names = df_for_a["party"].value_counts().head(4)
 #print(top4_party_names)
 
 #remove any rows where the value of the ‘party’ column is not one of the four most common party names(verified against test Excel)
-top4_df = df[df["party"].isin(top4_party_names.index)]
+top4_df = df_for_a[df["party"].isin(top4_party_names.index)]
 num_rows = top4_df.shape[0]
 #print(num_rows)
 
-#removing value, rows will stay,  replacing with "" 
+#removing value, rows will stay,  replacing with "" . Number of rows in the top4 because according to the requirement we need to make it after gathering
+# most common leaders. If we would clean Speaker before generating top4 the shape of the matrix would be different because Speaker is one of the leaders ub the current version
 top4_df.loc[top4_df["party"] == "Speaker", "party"] = ""
 
 num_rows = top4_df.shape[0]
@@ -77,7 +80,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 #c
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. 
 #Training base on training data and then predict using test observations (X_test)
-random_f= RandomForestClassifier(n_estimators=300, random_state=26)
+print(y_train.value_counts())
+'''random_f= RandomForestClassifier(n_estimators=300, random_state=26)
 random_f.fit(X_train,y_train)
 y_pred_random_f = random_f.predict(X_test)
 #2.Train SVM with linear kernel
@@ -88,7 +92,7 @@ y_pred_svm = svm.predict(X_test)
 print("Macro-average f1 score for Random forest:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM:\n", classification_report(y_test,y_pred_svm))
+print("Classification_report for SVM:\n", classification_report(y_test,y_pred_svm))'''
 
 
 
