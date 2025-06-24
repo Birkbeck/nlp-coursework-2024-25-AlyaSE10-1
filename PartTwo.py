@@ -1,6 +1,8 @@
 
 from pathlib import Path
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 
 #loading data from csv file
 with open("p2-texts /hansard40000.csv", mode="r",encoding='utf-8') as file:
@@ -43,6 +45,34 @@ top4_df_no_sc = top4_df[top4_df["speech_class"] != 'Speech']
 #remove any rows where the text in the ‘speech’ column is less than 1000 characters long
 final_df = top4_df_no_sc[top4_df_no_sc['speech'].str.len() >=1000]
 print(final_df.shape)
+
+#b
+#1.Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
+3000.
+vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
+#2.Prepare the dataframe, remove the rows without target(NaN)
+print(df.shape)
+filtered_df = df[df["party"].notna()]
+print("Filtered df", filtered_df.shape)
+#3.Vectorize the speech column of the initial dataframe 
+X = vectorizer.fit_transform(filtered_df['speech'])
+#4.The goal of the assignment is to predict the political party, out target is column "party"
+y = filtered_df["party"]
+#S5.plit the data into a train and test set, using stratified sampling(when we divide observations we keep the same proportions between classes as we have in the intial dataset, helps with inbalanced classes like we have)
+# with a random seed of 26 (seed helps to get the same number each time we run the code)
+#I decided to split data 80/20 as we have normal size dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,
+    test_size=0.2,
+    stratify=y,
+    random_state=26
+)
+#6.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
+#print("train size:", X_train.shape)
+#print("test size", X_test.shape)
+
+
+
 
 
 
