@@ -3,6 +3,9 @@ from pathlib import Path
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, f1_score
 
 #loading data from csv file
 with open("p2-texts /hansard40000.csv", mode="r",encoding='utf-8') as file:
@@ -51,9 +54,9 @@ print(final_df.shape)
 3000.
 vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
 #2.Prepare the dataframe, remove the rows without target(NaN)
-print(df.shape)
+#print(df.shape)
 filtered_df = df[df["party"].notna()]
-print("Filtered df", filtered_df.shape)
+#print("Filtered df", filtered_df.shape)
 #3.Vectorize the speech column of the initial dataframe 
 X = vectorizer.fit_transform(filtered_df['speech'])
 #4.The goal of the assignment is to predict the political party, out target is column "party"
@@ -70,6 +73,25 @@ X_train, X_test, y_train, y_test = train_test_split(
 #6.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
 #print("train size:", X_train.shape)
 #print("test size", X_test.shape)
+
+#c
+#1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. 
+#Training base on training data and then predict using test observations (X_test)
+random_f= RandomForestClassifier(n_estimators=300, random_state=26)
+random_f.fit(X_train,y_train)
+y_pred_random_f = random_f.predict(X_test)
+#2.Train SVM with linear kernel
+svm = SVC(kernel='linear', random_state=26)
+svm.fit(X_train, y_train)
+y_pred_svm = svm.predict(X_test)
+#3.Print the scikit-learn macro-average f1 score and classification report for each classifier on the test set
+print("Macro-average f1 score for Random forest:", f1_score(y_test,y_pred_random_f,average="macro"))
+print("Classification_report for Random forest:\n", classification_report(y_test,y_pred_random_f))
+print("Macro-average f1 score for SVM:",f1_score(y_test,y_pred_svm,average="macro"))
+print("Classification_report for SVM:\n", classification_report(y_test,y_pred_svm))
+
+
+
 
 
 
