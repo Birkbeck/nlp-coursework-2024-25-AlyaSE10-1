@@ -71,22 +71,29 @@ X_train, X_test, y_train, y_test = train_test_split(
 print("train size:", X_train.shape)
 print("test size", X_test.shape)
 
-'''#c
-#1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. 
+#c
+#1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. Added class_weight balanced because I have not many samples for  Liberal Democrat
 #Training base on training data and then predict using test observations (X_test)
 print(y_train.value_counts())
-random_f= RandomForestClassifier(n_estimators=300, random_state=26)
+random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
 random_f.fit(X_train,y_train)
 y_pred_random_f = random_f.predict(X_test)
 #2.Train SVM with linear kernel
 svm = SVC(kernel='linear', random_state=26)
 svm.fit(X_train, y_train)
 y_pred_svm = svm.predict(X_test)
+#3. I received a warning Precision is ill-defined and being set to 0.0 in labels with no predicted samples.Testing the training procedure
+print(np.unique(y_pred_random_f, return_counts=True))
+print(np.unique(y_pred_svm, return_counts=True))
+
 #3.Print the scikit-learn macro-average f1 score and classification report for each classifier on the test set
+#I received goof resultf1score o.82 for RF and 0.87 for SVM for Conservative class (where I have many samples). With Labour and Scottish National party the results are mediuma and with Liberal Democrat they are very poor, I solved problem with warning that we do not have balanced dataset 
+# but still we do not have enough observations 
 print("Macro-average f1 score for Random forest:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM:\n", classification_report(y_test,y_pred_svm))'''
+print("Classification_report for SVM:\n", classification_report(y_test,y_pred_svm))
+
 
 
 
