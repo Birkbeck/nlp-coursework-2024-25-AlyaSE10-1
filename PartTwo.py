@@ -21,67 +21,75 @@ with open("p2-texts /hansard40000.csv", mode="r",encoding='utf-8') as file:
 #testing further results with local Excel dublicate of hansard40000.csv
 #checking number rows with Labour (Co-op) before replacing the value. Number is the same as in Excel
 filtered = df[df["party"] == 'Labour (Co-op)']
-#print(filtered)
-#num_rows = filtered.shape[0]
-#print(num_rows)
+#print(filtered.shape[0])
 
 #rename the ‘Labour (Co-op)’ value in ‘party’ column to ‘Labour’. Merging observation with the same party name
 df["party"] = df["party"].replace({"Labour (Co-op)":"Labour"}) 
-
-#num_rows = filtered.shape[0]
-#print(df.shape)
+#print(filtered.shape[0])
 
 #a(ii)
-#removing value Speaker before finding the top4. As I am preparing the dataset for further training and "party" column will be my target, value Speaker is not a party name, So it is a missing value. I clean only value not rows
-
+#removing value Speaker before finding the top4. As I am preparing the dataset for further training and "party" column will be my target,
+# value Speaker is not a party name, So it is a missing value. I clean only value not rows with np.nan because when I replaced with "" it was treated as a string and I still saw "Speaker" rows
 df["party"] = df["party"].replace("Speaker",np.nan)
 #testing whether Speaker value was replaced
 #filtered = df[df["party"]== "Speaker"]
 #print(filtered.shape)
-#Now when I cleaned not relevant Speaker I am searching for top 4 party names that I will predict on a future steps of the task. By default value_counts will ignore the NA "party" value.  
+
+#Now when I cleaned not relevant Speaker I am searching for top 4 party names that I will predict on a future steps of the task. 
 top4 = df["party"].value_counts(dropna=True).head(4).index
 #checking the leaders, that Speaker is not there. Numbers and Leader are verified against excel#
 #print(top4)
 df_top4 =  df[df["party"].isin(top4)]
 #print("Top4", df_top4.shape)
 
-#I will use column 'speech" for predicting the party name. That is why on this step I remove any rows where the value in the ‘speech_class’ column is not ‘Speech’, so has not relevant data. The number of rows is the same as in previous dataframe because we have speech in all observations
+#I will use column 'speech" for predicting the party name. That is why on this step I remove any rows where 
+# the value in the ‘speech_class’ column is not ‘Speech’, so has not relevant data. The number of rows is the same as in previous dataframe because we have speech in all observations
 df_top4 = df_top4[df_top4["speech_class"] == 'Speech']
 #print("Only speech", df_top4.shape)
 
-#For detecting nessesary features I need a long text, there is no nesessary information in small speech. That is why I remove any rows where the text in the ‘speech’ column is less than 1000 characters long
+#For detecting nessesary features I need a long text, there is no nesessary information in small speech. 
+# That is why I remove any rows where the text in the ‘speech’ column is less than 1000 characters long
 df_prepared = df_top4[df_top4['speech'].str.len() >=1000]
-#Checking my final dataframe. This is my prepared dataset with information about 4 classes where I have enough information for orediction. Dataset is still not balanced but I get rid off parties with extremely small number of observation 
+#Checking my final dataframe. This is my prepared dataset with information about 4 classes. 
 print(df_prepared.shape)
 
 #b
 #1.Make a function vectorizer, that include different parameters that I will reuse afterwards 
-def vectorizer(stop_words=None,max_features=None,ngram_range=(1,1),tokenizer=None,lowercase=True,vocabulary=None):
+def create_vectorizer(stop_words=None,max_features=None,ngram_range=(1,1),tokenizer=None,lowercase=True,vocabulary=None):
+    vectorizer = TfidfVectorizer(
+        stop_words=stop_words,
+        max_features=max_features,
+        ngram_range=ngram_range,
+        tokenizer=tokenizer,
+        lowercase=lowercase,
+        vocabulary=vocabulary
+    )
     return vectorizer
-# Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
-3000.
-vectorizer_1 = vectorizer(stop_words="english",max_features=3000)
+# Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to 3000.
+vectorizer = create_vectorizer(stop_words="english",max_features=3000)
 '''
 #2.Vectorize the speech column of the dataframe 
 X = vectorizer.fit_transform(df_prepared['speech'])
 #3.The goal of the assignment is to predict the political party, out target is column "party"
 y = df_prepared["party"]
-#4.Split the data into a train and test set, using stratified sampling(when we divide observations we keep the same proportions between classes as we have in the intial dataset, helps with inbalanced classes like we have)
+#4.Split the data into a train and test set, using stratified sampling(when I divide observations I keep the same proportions between classes
+# as I have in the intial dataset, helps with inbalanced classes like I have)
 # with a random seed of 26 (seed helps to get the same number each time we run the code)
-#I decided to split data 80/20 as we have normal size dataset
+#I decided to split data 80/20
 X_train, X_test, y_train, y_test = train_test_split(
     X,y,
     test_size=0.2,
     stratify=y,
     random_state=26
 )
-#5.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
+#5.Checking the results with print and excel. 
+# I have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
 #print("train size:", X_train.shape)
 #print("test size", X_test.shape)
 
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. Added class_weight balanced because I have not many samples for  Liberal Democrat
 #Training base on training data and then predict using test observations (X_test)
-#print(y_train.value_counts())
+
 random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
 random_f.fit(X_train,y_train)
 y_pred_random_f = random_f.predict(X_test)
@@ -97,7 +105,7 @@ print(np.unique(y_pred_random_f, return_counts=True))
 print(np.unique(y_pred_svm, return_counts=True))
 
 #3.Print the scikit-learn macro-average f1 score and classification report for each classifier on the test set
-#I received goof f1score (0.82 for RF and 0.87 for SVM) for Conservative class (where I have many samples). With Labour and Scottish National party the results are mediuma and with Liberal Democrat they are very poor,
+#I received good f1score (0.82 for RF and 0.87 for SVM) for Conservative class (where I have many samples). With Labour and Scottish National party the results are medium and with Liberal Democrat they are very poor,
 # I solved problem with warning that we do not have balanced dataset but still we do not have enough observations 
 #I definitely need to reconsider feature selections and methods for better results because we can not distinguish the paterns nesessary for class detection
 print("Macro-average f1 score for Random forest:", f1_score(y_test,y_pred_random_f,average="macro"))
@@ -108,8 +116,9 @@ print("Classification_report for SVM:\n", classification_report(y_test,y_pred_sv
 
 #d
 #1. Adjust the parameters of the Tfidfvectorizer so that unigrams, bi-grams and tri-grams will be considered as features, limiting the total number of features to
-#3000. As I am analysing the political speeches stopwords can be useful for detection the paterns. Like the opposition may say "not good", insted of "good" and so on. As there is a grey are
-vectorizer=TfidfVectorizer(ngram_range=(1,3),max_features=3000)
+#3000. As I am analysing the political speeches stopwords can be useful for detection the paterns. 
+# Like the opposition may say "not good", insted of "good" and so on. As there is a grey area
+vectorizer=create_vectorizer(ngram_range=(1,3),max_features=3000)
 #2.Vectorize the speech column of the dataframe 
 X = vectorizer.fit_transform(df_prepared['speech'])
 y = df_prepared["party"]
@@ -220,10 +229,10 @@ def bespoke_tokenizer(text):
 print("Total feature form custom tokeniser", len(all_features))
  
  #Feeding Tfidvectorizer with a custom tokenizer
-vectorizer_bespoke = vectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=False, vocabulary=all_features,  max_features=3000)
+vectorizer = create_vectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=False, vocabulary=all_features,  max_features=3000)
 
 #Vectorize the speahces with bespoke tokenizer
-X_bespoke = vectorizer_bespoke.fit_transfrom(df_prepared['X'])
+X_bespoke = vectorizer.fit_transform(df_prepared['X'])
 y = df_prepared['y']
 
 #Split samples 
