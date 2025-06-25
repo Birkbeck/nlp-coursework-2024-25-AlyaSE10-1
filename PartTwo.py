@@ -54,11 +54,13 @@ df_prepared = df_top4[df_top4['speech'].str.len() >=1000]
 #Checking my final dataframe. This is my prepared dataset with information about 4 classes where I have enough information for orediction. Dataset is still not balanced but I get rid off parties with extremely small number of observation 
 print(df_prepared.shape)
 
-'''#b
+#b
 #1.Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
 3000.
+
 vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
 
+'''
 #2.Vectorize the speech column of the dataframe 
 X = vectorizer.fit_transform(df_prepared['speech'])
 #3.The goal of the assignment is to predict the political party, out target is column "party"
@@ -74,18 +76,22 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 #5.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
 #print("train size:", X_train.shape)
-#print("test size", X_test.shape)
+#print("test size", X_test.shape)'''
 
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. Added class_weight balanced because I have not many samples for  Liberal Democrat
 #Training base on training data and then predict using test observations (X_test)
 #print(y_train.value_counts())
-random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
-random_f.fit(X_train,y_train)
-y_pred_random_f = random_f.predict(X_test)
+def rf(X_train,y_train):
+    random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
+    random_f.fit(X_train,y_train)
+    y_pred_random_f = random_f.predict(X_test)
+    return y_pred_random_f
 #2.Train SVM with linear kernel
-svm = SVC(kernel='linear', random_state=26)
-svm.fit(X_train, y_train)
-y_pred_svm = svm.predict(X_test)
+def svm(X_train,y_train):
+    svm = SVC(kernel='linear', random_state=26)
+    svm.fit(X_train, y_train)
+    y_pred_svm = svm.predict(X_test)
+    return y_pred_svm
 #3. I received a warning Precision is ill-defined and being set to 0.0 in labels with no predicted samples.Testing the training procedure
 print(np.unique(y_pred_random_f, return_counts=True))
 print(np.unique(y_pred_svm, return_counts=True))
@@ -126,7 +132,7 @@ y_pred_svm = svm.predict(X_test)
 print("Macro-average f1 score for Random forest with updated vectorizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with updated vectorizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with updated vectorizer:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))'''
+print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))
 
 #e
 #Ty to find more information about the speeches.I want to find out what can be the most frequent NERs and POS in the speaches per class, decided to go with spacy
@@ -176,75 +182,54 @@ for label in y_train.unique():
     for adj,count in pos_adj_counter[label].most_common(top_n):
         print(f" {adj}:{count}") 
 
- #Creating vocabulary for all features, using set in order to avopid dublicates
+ #Collecting all features, using set in order to avopid dublicates
 all_features = set()
 
 for label in ner_org_counter:
-    all_features.update(ner_org_counter[label].keys())
+    all_features.add(f"ORG:{org}")
 for label in ner_person_counter:
-    all_features.update(ner_person_counter[label].keys())
+    all_features.add(f"PERSON:{person}")
 for label in pos_verb_counter:
-    all_features.update(pos_verb_counter[label].keys())
+    all_features.add(f"VERB:{verb}")
 for label in pos_adj_counter:
-    all_features.update(pos_adj_counter[label].keys())  
+    all_features.add(f"ADJ:{adj}")  
 #Convert to list for fix order
 all_features = list(all_features)
 print(all_features[:10])
 
-'''
+
 #Building tokenizer using the feature I detected with Spacy
 feature_set = set(all_features)
-def bespoke_tokenizer(text)
+def bespoke_tokenizer(text):
     doc = nlp(text)
     tokens = []
-
     #NERs
     for ent in doc.ents:
-        if ent.label_in {"ORG", "PERSON"}:
-        tag = f"{ent.label_}:{ent.text}"
-        if tag in feature_set:
-        tokens.append(tag)
+        if ent.label_ in {"ORG", "PERSON"}:
+            tag = f"{ent.label_}:{ent.text}"
+            if tag in feature_set:
+                tokens.append(tag)
     #POCs lemmas
     for token in doc:
-        if token_pos_ in {"VERB", "ADJ}:
-        tag = f"{token.pos_}:{token.lemma_}"
-        if tag in feature_set:
-            tokens.append(tag)
+        if token.pos_ in {"VERB", "ADJ"}:
+            tag = f"{token.pos_}:{token.lemma_}"
+            if tag in feature_set:
+                tokens.append(tag)
     return tokens        
 
-
-'''
-
-'''
 print("Total feature form custom tokeniser", len(all_features))
  
  #Feeding Tfidvectorizer with a custom tokenizer
 vectorizer_bespoke = TfidfVectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=Dalse, vocabulary=all_features,  max_features=3000)
 
 #Vectorize the speahces with bespoke tokenizer
-X_bespoke = vectorizer_bespoke.fit_transfrom(prepared_df['X'])
-y = prepared_df['y']
+X_bespoke = vectorizer_bespoke.fit_transfrom(df_prepared['X'])
+y = df_prepared['y']
 
 #Split samples 
-X_train, X_test, y_train, y_test = train_test_split(X_tfidf)
-'''
+X_train, X_test, y_train, y_test = train_test_split(X_bespoke,y,test_size=0.2,stratify=y, random state = 26)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#Feature selection for noise reduction
+selector = SelectKBest(chi2, k=5)
+X_train_sel = selector.fit.transform(X_train,y_train)
+X_test_sel = selector.transform(X_test) 
