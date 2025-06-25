@@ -55,11 +55,12 @@ df_prepared = df_top4[df_top4['speech'].str.len() >=1000]
 print(df_prepared.shape)
 
 #b
-#1.Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
+#1.Make a function vectorizer, that include different parameters that I will reuse afterwards 
+def vectorizer(stop_words=None,max_features=None,ngram_range=(1,1),tokenizer=None,lowercase=True,vocabulary=None):
+    return vectorizer
+# Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
 3000.
-
-vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
-
+vectorizer_1 = vectorizer(stop_words="english",max_features=3000)
 '''
 #2.Vectorize the speech column of the dataframe 
 X = vectorizer.fit_transform(df_prepared['speech'])
@@ -76,22 +77,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 #5.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
 #print("train size:", X_train.shape)
-#print("test size", X_test.shape)'''
+#print("test size", X_test.shape)
 
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. Added class_weight balanced because I have not many samples for  Liberal Democrat
 #Training base on training data and then predict using test observations (X_test)
 #print(y_train.value_counts())
-def rf(X_train,y_train):
-    random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
-    random_f.fit(X_train,y_train)
-    y_pred_random_f = random_f.predict(X_test)
-    return y_pred_random_f
+random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
+random_f.fit(X_train,y_train)
+y_pred_random_f = random_f.predict(X_test)
+  
 #2.Train SVM with linear kernel
-def svm(X_train,y_train):
-    svm = SVC(kernel='linear', random_state=26)
-    svm.fit(X_train, y_train)
-    y_pred_svm = svm.predict(X_test)
-    return y_pred_svm
+
+svm = SVC(kernel='linear', random_state=26)
+svm.fit(X_train, y_train)
+y_pred_svm = svm.predict(X_test)
+
 #3. I received a warning Precision is ill-defined and being set to 0.0 in labels with no predicted samples.Testing the training procedure
 print(np.unique(y_pred_random_f, return_counts=True))
 print(np.unique(y_pred_svm, return_counts=True))
@@ -132,7 +132,7 @@ y_pred_svm = svm.predict(X_test)
 print("Macro-average f1 score for Random forest with updated vectorizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with updated vectorizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with updated vectorizer:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))
+print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))'''
 
 #e
 #Ty to find more information about the speeches.I want to find out what can be the most frequent NERs and POS in the speaches per class, decided to go with spacy
@@ -220,16 +220,34 @@ def bespoke_tokenizer(text):
 print("Total feature form custom tokeniser", len(all_features))
  
  #Feeding Tfidvectorizer with a custom tokenizer
-vectorizer_bespoke = TfidfVectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=Dalse, vocabulary=all_features,  max_features=3000)
+vectorizer_bespoke = vectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=False, vocabulary=all_features,  max_features=3000)
 
 #Vectorize the speahces with bespoke tokenizer
 X_bespoke = vectorizer_bespoke.fit_transfrom(df_prepared['X'])
 y = df_prepared['y']
 
 #Split samples 
-X_train, X_test, y_train, y_test = train_test_split(X_bespoke,y,test_size=0.2,stratify=y, random state = 26)
+X_train, X_test, y_train, y_test = train_test_split(X_bespoke,y,test_size=0.2,stratify=y, random_state = 26)
 
-#Feature selection for noise reduction
+#Feature selection for noise reduction and preventing overfiting
 selector = SelectKBest(chi2, k=5)
 X_train_sel = selector.fit.transform(X_train,y_train)
 X_test_sel = selector.transform(X_test) 
+
+#Train Random forest
+random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
+random_f.fit(X_train_sel,y_train)
+y_pred_random_f = random_f.predict(X_test_sel)
+  
+#2.Train SVM with linear kernel
+
+svm = SVC(kernel='linear', class_weight="balanced", random_state=26)
+svm.fit(X_train_sel, y_train)
+y_pred_svm = svm.predict(X_test_sel)
+
+print("Macro-average f1 score for Random forest with custom tokenizer:", f1_score(y_test,y_pred_random_f,average="macro"))
+print("Classification_report for Random forest with custom tokenizer:\n", classification_report(y_test,y_pred_random_f))
+print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))
+print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))
+
+
