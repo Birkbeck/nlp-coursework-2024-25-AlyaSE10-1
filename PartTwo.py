@@ -174,7 +174,8 @@ for text,label in zip(X_train,y_train):
         elif token.pos_ == "ADJ":
             pos_adj_counter[label][token.lemma_] += 1
 #printing the results
-top_n = 10
+
+'''top_n = 500
 
 for label in y_train.unique():
     print(f"\nClass: {label}")
@@ -189,26 +190,32 @@ for label in y_train.unique():
         print(f" {verb}:{count}") 
     print("Top ADJs:")    
     for adj,count in pos_adj_counter[label].most_common(top_n):
-        print(f" {adj}:{count}") 
+        print(f" {adj}:{count}") '''
 
  #Collecting all features, using set in order to avopid dublicates
 all_features = set()
 
+
 for label in ner_org_counter:
-    all_features.add(f"ORG:{org}")
+    for org in ner_org_counter[label]:
+        all_features.add(f"ORG:{org}")
 for label in ner_person_counter:
-    all_features.add(f"PERSON:{person}")
+    for person in ner_person_counter[label]:
+        all_features.add(f"PERSON:{person}")
 for label in pos_verb_counter:
-    all_features.add(f"VERB:{verb}")
+    for verb in pos_verb_counter[label]:
+        all_features.add(f"VERB:{verb}")
 for label in pos_adj_counter:
-    all_features.add(f"ADJ:{adj}")  
+    for adj in pos_adj_counter[label]:
+        all_features.add(f"ADJ:{adj}")  
 #Convert to list for fix order
 all_features = list(all_features)
-print(all_features[:10])
+print(len(all_features))
 
 
 #Building tokenizer using the feature I detected with Spacy
 feature_set = set(all_features)
+
 def bespoke_tokenizer(text):
     doc = nlp(text)
     tokens = []
@@ -225,21 +232,23 @@ def bespoke_tokenizer(text):
             if tag in feature_set:
                 tokens.append(tag)
     return tokens        
+for text,label in zip(X_train,y_train):
+    doc = nlp(text)
 
 print("Total feature form custom tokeniser", len(all_features))
  
  #Feeding Tfidvectorizer with a custom tokenizer
-vectorizer = create_vectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=False, vocabulary=all_features,  max_features=3000)
+vectorizer_bespoke = create_vectorizer(ngram_range=(1,1),tokenizer=bespoke_tokenizer, lowercase=False, vocabulary=all_features,  max_features=3000)
 
-#Vectorize the speahces with bespoke tokenizer
-X_bespoke = vectorizer.fit_transform(df_prepared['X'])
-y = df_prepared['y']
+#Vectorize the speeches with bespoke tokenizer
+X_bespoke = vectorizer_bespoke.fit_transform(df_prepared['speech'])
+y = df_prepared['party']
 
 #Split samples 
 X_train, X_test, y_train, y_test = train_test_split(X_bespoke,y,test_size=0.2,stratify=y, random_state = 26)
 
 #Feature selection for noise reduction and preventing overfiting
-selector = SelectKBest(chi2, k=5)
+selector = SelectKBest(chi2, k=50)
 X_train_sel = selector.fit.transform(X_train,y_train)
 X_test_sel = selector.transform(X_test) 
 
@@ -258,5 +267,3 @@ print("Macro-average f1 score for Random forest with custom tokenizer:", f1_scor
 print("Classification_report for Random forest with custom tokenizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))
 print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))
-
-
