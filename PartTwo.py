@@ -48,20 +48,17 @@ df_top4 = df_top4[df_top4["speech_class"] == 'Speech']
 df_prepared = df_top4[df_top4['speech'].str.len() >=1000]
 #Checking my final dataframe. This is my prepared dataset with information about 4 classes where I have enough information for orediction. Dataset is still not balanced but I get rid off parties with extremely small number of observation 
 print(df_prepared.shape)
-'''
+
 #b
 #1.Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
 3000.
 vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
-#2.Prepare the dataframe, remove the rows without target(NaN)
-#print(df.shape)
-filtered_df = df[df["party"].notna()]
-#print("Filtered df", filtered_df.shape)
-#3.Vectorize the speech column of the initial dataframe 
-X = vectorizer.fit_transform(filtered_df['speech'])
-#4.The goal of the assignment is to predict the political party, out target is column "party"
-y = filtered_df["party"]
-#S5.plit the data into a train and test set, using stratified sampling(when we divide observations we keep the same proportions between classes as we have in the intial dataset, helps with inbalanced classes like we have)
+
+#2.Vectorize the speech column of the initial dataframe 
+X = vectorizer.fit_transform(df_prepared['speech'])
+#3.The goal of the assignment is to predict the political party, out target is column "party"
+y = df_prepared["party"]
+#4.Split the data into a train and test set, using stratified sampling(when we divide observations we keep the same proportions between classes as we have in the intial dataset, helps with inbalanced classes like we have)
 # with a random seed of 26 (seed helps to get the same number each time we run the code)
 #I decided to split data 80/20 as we have normal size dataset
 X_train, X_test, y_train, y_test = train_test_split(
@@ -70,11 +67,11 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y,
     random_state=26
 )
-#6.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
-#print("train size:", X_train.shape)
-#print("test size", X_test.shape)
+#5.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
+print("train size:", X_train.shape)
+print("test size", X_test.shape)
 
-#c
+'''#c
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. 
 #Training base on training data and then predict using test observations (X_test)
 print(y_train.value_counts())
