@@ -7,6 +7,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, f1_score
 import numpy as np
+import spacy
+from collections import Counter, defaultdict
+
+nlp = spacy.load("en_core_web_sm")
 
 #loading data from csv file.The df is the source for our next tasks
 with open("p2-texts /hansard40000.csv", mode="r",encoding='utf-8') as file:
@@ -49,7 +53,7 @@ df_prepared = df_top4[df_top4['speech'].str.len() >=1000]
 #Checking my final dataframe. This is my prepared dataset with information about 4 classes where I have enough information for orediction. Dataset is still not balanced but I get rid off parties with extremely small number of observation 
 print(df_prepared.shape)
 
-#b
+'''#b
 #1.Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to
 3000.
 vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
@@ -121,7 +125,57 @@ y_pred_svm = svm.predict(X_test)
 print("Macro-average f1 score for Random forest with updated vectorizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with updated vectorizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with updated vectorizer:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))
+print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))'''
+
+#e
+#Ty to find more information about the speeches.I want to find out what can be the most frequent NERs and POS in the speaches per class, decided to go with spacy
+ner_org_counter = defaultdict(Counter)
+ner_person_counter = defaultdict(Counter)
+pos_verb_counter = defaultdict(Counter)
+pos_adj_counter = defaultdict(Counter)
+X = df_prepared['speech']
+y = df_prepared["party"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,
+    test_size=0.2,
+    stratify=y,
+    random_state=26
+)
+#use training dataset for preventing data leakage
+for text,label in zip(X_train,y_train):
+    doc = nlp(text)
+
+    #Distinguish NERs
+    for ent in doc.ents:
+        if ent.label_ == "ORG":
+            ner_org_counter[label][ent.text] +=1
+        elif ent.label_ == "PERSON":
+            ner_person_counter[label][ent.text] += 1
+    #Detect POS
+    for token in doc:
+        if token.pos_ == "VERB":
+            pos_verb_counter[label][token.lemma_] += 1 
+        elif token.pos_ == "ADJ":
+            pos_adj_counter[label][token.lemma_] += 1
+#printing the results
+top_n = 10
+
+for label in y_train.unique():
+    print(f"\nClass: {label}")
+    print("Top ORG entities:")
+    for org,count in ner_org_counter[label].most_common(top_n):
+        print(f" {org}:{count}")
+    print("Top Person entities:")    
+    for person,count in ner_person_counter[label].most_common(top_n):
+        print(f" {person}:{count}")    
+    print("Top VERBs:")    
+    for verb,count in pos_verb_counter[label].most_common(top_n):
+        print(f" {verb}:{count}") 
+    print("Top ADJs:")    
+    for adj,count in pos_adj_counter[label].most_common(top_n):
+        print(f" {adj}:{count}")     
+
+
 
 
 
