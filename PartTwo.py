@@ -223,7 +223,7 @@ for label in pos_adj_counter:
 all_features = list(all_features)
 print(len(all_features))
 
-'''
+
 #Building tokenizer using the feature I detected with Spacy
 feature_set = set(all_features)
 
@@ -277,4 +277,4 @@ y_pred_svm = svm.predict(X_test_sel)
 print("Macro-average f1 score for Random forest with custom tokenizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with custom tokenizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))'''
+print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))

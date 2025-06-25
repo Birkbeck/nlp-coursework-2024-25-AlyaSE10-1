@@ -1,9 +1,10 @@
 Part 1 (d)
 When is the Flesch Kincaid score *not* a valid, robust or reliable estimator of text difficulty? Give two conditions. (Text answer, 200 words maximum).
-Answer: Flesch Kincaid score measures complexity of the text by estimating length of the words with counting sylables, sentences. It is a measurement of readability but it does not applicable for estimating the complexity of the Text
-if we have complexity of the vocabulary because it is not only short words are more readable, it is not always true. Some text can be with short words and/or sentences but full of complex abbreviation and acronyms
-or some specific vocabulary that will not be fairly evaluated with Flesch Kincaid. 
-As Flesch Kincaid score is trained on English and rebased on conunting sylables the method will not be robust  on not English texts. Like in   
+Answer: The Flesch-Kincaid score measures the complexity of the text by estimating quantitative measurements such as the number of words, sentences, and word length, by calculating the syllables. The idea is that the shorter words and sentences are easier to read. However, this is not always the case. 
+The method cannot measure the difficulty of the words. Some text can be with short words and/or sentences, but full of abbreviations/ acronyms or specific vocabulary that is hard to grasp, even though it is several syllables long. We can imagine a medical article full of abbreviations, such as fMRIs and gene information. 
+Applying the score’s formula cannot measure the qualitative side of the text – the efforts needed to process the meaning behind the text.
+The Flesch-Kincaid score is based on counting syllables, which is a language-specific measure. The approach was trained on English and the method will not be robust for non-English syllables. Like in French, there is "d'être" and in  Ukrainian "здоров'я". Such languages have different symbols that cannot be properly calculated.  
+
 
 Part2 (f) 
 Explain your tokenizer function and discuss its performance
