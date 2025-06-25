@@ -54,7 +54,7 @@ print(df_prepared.shape)
 3000.
 vectorizer = TfidfVectorizer(stop_words="english",max_features=3000)
 
-#2.Vectorize the speech column of the initial dataframe 
+#2.Vectorize the speech column of the dataframe 
 X = vectorizer.fit_transform(df_prepared['speech'])
 #3.The goal of the assignment is to predict the political party, out target is column "party"
 y = df_prepared["party"]
@@ -68,13 +68,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=26
 )
 #5.Checking the results with print and excel. We have a nice dimentions where the number of rows are 80/20 of the intial filtered dataframe and the columns are max_features, 3000
-print("train size:", X_train.shape)
-print("test size", X_test.shape)
+#print("train size:", X_train.shape)
+#print("test size", X_test.shape)
 
-#c
 #1.Train Random forest classifier with n_estimators = 300(number of trees), keep the same seed. Added class_weight balanced because I have not many samples for  Liberal Democrat
 #Training base on training data and then predict using test observations (X_test)
-print(y_train.value_counts())
+#print(y_train.value_counts())
 random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
 random_f.fit(X_train,y_train)
 y_pred_random_f = random_f.predict(X_test)
@@ -87,12 +86,42 @@ print(np.unique(y_pred_random_f, return_counts=True))
 print(np.unique(y_pred_svm, return_counts=True))
 
 #3.Print the scikit-learn macro-average f1 score and classification report for each classifier on the test set
-#I received goof resultf1score o.82 for RF and 0.87 for SVM for Conservative class (where I have many samples). With Labour and Scottish National party the results are mediuma and with Liberal Democrat they are very poor, I solved problem with warning that we do not have balanced dataset 
-# but still we do not have enough observations 
+#I received goof f1score (0.82 for RF and 0.87 for SVM) for Conservative class (where I have many samples). With Labour and Scottish National party the results are mediuma and with Liberal Democrat they are very poor,
+# I solved problem with warning that we do not have balanced dataset but still we do not have enough observations 
+#I definitely need to reconsider feature selections and methods for better results because we can not distinguish the paterns nesessary for class detection
 print("Macro-average f1 score for Random forest:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM:",f1_score(y_test,y_pred_svm,average="macro"))
 print("Classification_report for SVM:\n", classification_report(y_test,y_pred_svm))
+
+
+#d
+#1. Adjust the parameters of the Tfidfvectorizer so that unigrams, bi-grams and tri-grams will be considered as features, limiting the total number of features to
+#3000. As I am analysing the political speeches stopwords can be useful for detection the paterns. Like the opposition may say "not good", insted of "good" and so on. As there is a grey are
+vectorizer=TfidfVectorizer(ngram_range=(1,3),max_features=3000)
+#2.Vectorize the speech column of the dataframe 
+X = vectorizer.fit_transform(df_prepared['speech'])
+y = df_prepared["party"]
+#3.Split the data as before
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,
+    test_size=0.2,
+    stratify=y,
+    random_state=26
+)
+#4. Training Random forest with the  new vectorizer
+random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=26)
+random_f.fit(X_train,y_train)
+y_pred_random_f = random_f.predict(X_test)
+#5.Train SVM with the new vectorizer
+svm = SVC(kernel='linear', random_state=26)
+svm.fit(X_train, y_train)
+y_pred_svm = svm.predict(X_test)
+#6.Print the scikit-learn macro-average f1 score and classification report for each classifier on the test set
+print("Macro-average f1 score for Random forest with updated vectorizer:", f1_score(y_test,y_pred_random_f,average="macro"))
+print("Classification_report for Random forest with updated vectorizer:\n", classification_report(y_test,y_pred_random_f))
+print("Macro-average f1 score for SVM with updated vectorizer:",f1_score(y_test,y_pred_svm,average="macro"))
+print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))
 
 
 
