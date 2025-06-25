@@ -192,6 +192,17 @@ for label in y_train.unique():
     for adj,count in pos_adj_counter[label].most_common(top_n):
         print(f" {adj}:{count}") '''
 
+#The size of fetaures reached 23000.  Reducing noice by cutting the number of features 
+top_n = 500
+for label in ner_org_counter:
+    ner_org_counter[label] = Counter(dict(ner_org_counter[label].most_common(top_n)))
+for label in ner_person_counter:
+    ner_person_counter[label] = Counter(dict(ner_person_counter[label].most_common(top_n)))    
+for label in pos_verb_counter:
+    pos_verb_counter[label] = Counter(dict(pos_verb_counter[label].most_common(top_n)))    
+for label in pos_adj_counter:
+    pos_adj_counter[label] = Counter(dict(pos_adj_counter[label].most_common(top_n))) 
+
  #Collecting all features, using set in order to avopid dublicates
 all_features = set()
 
@@ -212,7 +223,7 @@ for label in pos_adj_counter:
 all_features = list(all_features)
 print(len(all_features))
 
-
+'''
 #Building tokenizer using the feature I detected with Spacy
 feature_set = set(all_features)
 
@@ -266,4 +277,4 @@ y_pred_svm = svm.predict(X_test_sel)
 print("Macro-average f1 score for Random forest with custom tokenizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with custom tokenizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))
+print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))'''
