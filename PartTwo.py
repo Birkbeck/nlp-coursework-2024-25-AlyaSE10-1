@@ -159,7 +159,7 @@ for text,label in zip(X_train,y_train):
         elif token.pos_ == "ADJ":
             pos_adj_counter[label][token.lemma_] += 1
 #printing the results
-top_n = 1000
+top_n = 10
 
 for label in y_train.unique():
     print(f"\nClass: {label}")
@@ -180,23 +180,54 @@ for label in y_train.unique():
 all_features = set()
 
 for label in ner_org_counter:
-    all_features.update(ner_org_counter[label].keys)
+    all_features.update(ner_org_counter[label].keys())
 for label in ner_person_counter:
-    all_features.update(ner_person_counter[label].keys)
+    all_features.update(ner_person_counter[label].keys())
 for label in pos_verb_counter:
-    all_features.update(pos_verb_counter[label].keys)
+    all_features.update(pos_verb_counter[label].keys())
 for label in pos_adj_counter:
-    all_features.update(pos_adj_counter[label].keys)  
+    all_features.update(pos_adj_counter[label].keys())  
 #Convert to list for fix order
 all_features = list(all_features)
+print(all_features[:10])
 
+'''
+#Building tokenizer using the feature I detected with Spacy
+feature_set = set(all_features)
+def bespoke_tokenizer(text)
+    doc = nlp(text)
+    tokens = []
+
+    #NERs
+    for ent in doc.ents:
+        if ent.label_in {"ORG", "PERSON"}:
+        tag = f"{ent.label_}:{ent.text}"
+        if tag in feature_set:
+        tokens.append(tag)
+    #POCs lemmas
+    for token in doc:
+        if token_pos_ in {"VERB", "ADJ}:
+        tag = f"{token.pos_}:{token.lemma_}"
+        if tag in feature_set:
+            tokens.append(tag)
+    return tokens        
+
+
+'''
+
+'''
 print("Total feature form custom tokeniser", len(all_features))
  
- #Feature pre-selection. I have my features but I want to detect what features are most relevent for this particular class in comparison with other three classes. For reducing noise
-for target_class in y_train.unique():
-    binary_y  =  y_train == target_class.astype(int) 
-    selector = SelectKBest(chi2, k=50)  
-    selector.fit()
+ #Feeding Tfidvectorizer with a custom tokenizer
+vectorizer_bespoke = TfidfVectorizer(ngram_range=(1,3),tokenizer=bespoke_tokenizer, lowercase=Dalse, vocabulary=all_features,  max_features=3000)
+
+#Vectorize the speahces with bespoke tokenizer
+X_bespoke = vectorizer_bespoke.fit_transfrom(prepared_df['X'])
+y = prepared_df['y']
+
+#Split samples 
+X_train, X_test, y_train, y_test = train_test_split(X_tfidf)
+'''
 
 
 
