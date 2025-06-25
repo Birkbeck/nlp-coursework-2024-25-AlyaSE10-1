@@ -2,6 +2,7 @@
 from pathlib import Path
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_selection import chi2, SelectKBest
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
@@ -158,7 +159,7 @@ for text,label in zip(X_train,y_train):
         elif token.pos_ == "ADJ":
             pos_adj_counter[label][token.lemma_] += 1
 #printing the results
-top_n = 10
+top_n = 1000
 
 for label in y_train.unique():
     print(f"\nClass: {label}")
@@ -173,7 +174,30 @@ for label in y_train.unique():
         print(f" {verb}:{count}") 
     print("Top ADJs:")    
     for adj,count in pos_adj_counter[label].most_common(top_n):
-        print(f" {adj}:{count}")     
+        print(f" {adj}:{count}") 
+
+ #Creating vocabulary for all features, using set in order to avopid dublicates
+all_features = set()
+
+for label in ner_org_counter:
+    all_features.update(ner_org_counter[label].keys)
+for label in ner_person_counter:
+    all_features.update(ner_person_counter[label].keys)
+for label in pos_verb_counter:
+    all_features.update(pos_verb_counter[label].keys)
+for label in pos_adj_counter:
+    all_features.update(pos_adj_counter[label].keys)  
+#Convert to list for fix order
+all_features = list(all_features)
+
+print("Total feature form custom tokeniser", len(all_features))
+ 
+ #Feature pre-selection. I have my features but I want to detect what features are most relevent for this particular class in comparison with other three classes. For reducing noise
+for target_class in y_train.unique():
+    binary_y  =  y_train == target_class.astype(int) 
+    selector = SelectKBest(chi2, k=50)  
+    selector.fit()
+
 
 
 
