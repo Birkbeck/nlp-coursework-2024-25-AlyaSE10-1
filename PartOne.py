@@ -236,21 +236,11 @@ def syntactic_objects(doc):
     
     #title_syn_obj = {}
     syn_obj_l = ["dobj", "podj", "iobj"]
-    #for i in range(len(df)):
-        #syntactic_obj.update([token.dep_ for token in "tokens_spacy" if token.dep_ != " "])
-        #ten_syntatic_obj = syntactic_obj.most_common(10)
-        #title = df['title']
-        #tokens = df['tokens_parsed']
     syn_obj_counter = Counter()
     for token in doc:
         if token.dep_ in syn_obj_l:
             syn_obj_counter[token.text.lower()] += 1
     syn_obj = [word for word, count in syn_obj_counter.most_common(10)]
-
-    #print(syn_obj) 
-    #for token in syn_obj:
-    #    print(f"{token.text} - {token.dep_}")
-            #title_syn_obj[title] = syn_obj
     return syn_obj
     
     #for title, deps in  title_syn_obj():
@@ -261,7 +251,7 @@ if __name__ == "__main__":
     uncomment the following lines to run the functions once you have completed them
     """
     path = Path.cwd() / "p1-texts" / "novels" #(/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") 
-    #print(path)
+    print(path)
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
     print(df.head())
     nltk.download("cmudict")
@@ -269,7 +259,7 @@ if __name__ == "__main__":
     print(df.head())
     print(get_ttrs(df))
     print(get_fks(df))
-    #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
+    df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     
     for i, row in df.iterrows():
         print(row["title"])
