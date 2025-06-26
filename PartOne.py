@@ -97,13 +97,12 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""
     df["parsed"] = df["text"].apply(nlp)
-    #renamed column token_spacy to parsed. need to change
-    '''if len("token_spacy") > nlp.max_length:
-        chunks = ["token_spacy"[i:i+nlp.max_length] for i in range(0,len("token_spacy"), nlp.max_length)]
-        docs = [nlp(chunk) for chunk in chunks]
-        return docs
-    else:
-        return ["token_spacy"]'''
+    #pushing data in pickle and taking them back
+    #full_path = store_path/out_name
+    #df["parsed"] = df["text"].apply(nlp)
+    #df.to_pickle(full_path)
+    #df = pd.read_pickle(full_path)
+    
         
     return df
     #df.to_pickle("dataframe_parsed.pkl")
@@ -259,7 +258,7 @@ if __name__ == "__main__":
     print(df.head())
     print(get_ttrs(df))
     print(get_fks(df))
-    df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
+    #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
     
     for i, row in df.iterrows():
         print(row["title"])
