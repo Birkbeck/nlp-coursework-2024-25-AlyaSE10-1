@@ -204,7 +204,7 @@ for label in pos_verb_counter:
 for label in pos_adj_counter:
     pos_adj_counter[label] = Counter(dict(pos_adj_counter[label].most_common(top_n))) 
 
- #Collecting all features, using set in order to avopid dublicates
+ #Collecting all features, using set in order to avoid dublicates
 all_features = set()
 for label in ner_org_counter:
     for org in ner_org_counter[label]:
@@ -220,7 +220,7 @@ for label in pos_adj_counter:
         all_features.add(f"ADJ:{adj}")  
 #Convert to list for fix order
 all_features = list(all_features)
-print(len(all_features))
+#print(len(all_features))
 
 
 #Building tokenizer using the feature I detected with Spacy
@@ -276,7 +276,7 @@ y_pred_svm = svm.predict(X_test_sel)
 
 
 #Evaluating 2 classifiers 
-print("Macro-average f1 score for Random forest with custom tokenizer:", f1_score(y_test,y_pred_random_f,average="macro"))
+#print("Macro-average f1 score for Random forest with custom tokenizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with custom tokenizer:\n", classification_report(y_test,y_pred_random_f))
-print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))
+#print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))
 print("Classification_report for SVM with custom tokenizer:\n", classification_report(y_test,y_pred_svm))

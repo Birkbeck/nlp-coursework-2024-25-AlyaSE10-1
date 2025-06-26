@@ -8,4 +8,33 @@ The Flesch-Kincaid score is based on counting syllables, which is a language-spe
 
 Part2 (f) 
 Explain your tokenizer function and discuss its performance
-Answer:
+Logic
+Answer:In order to detect a necessary features for classification I decided to use spacy and detect most common:
+Named entity recognition(NER): organisations and persons. As we have speeches, I assumed that each Speaker may mention some specific organisations and people more often
+Part of speech (POS): adjectives and verbs. As some parties are encouraging people to  some actions, I assumed this could be a good identifier.  Like an ongoing party may explain that they "solve" some issues when the opposite can "question" their actions.
+Similarly, using Spacy for adjectives detection, I may find a pattern where one party primarily relates to "young" people, such as "Scottish" problems (for the Scottish party).
+Method
+Firstly, I detected features per class and printed the most common ones to determine whether it is worth pursuing. I saw that the approach may work and proceed.
+I collected all the features into a single set. As I tested my code with "print" statement, I saw that the number of found features is more than 24000, which has too much noise.
+We need to identify the most common features, and I filtered them to obtain a manageable number of 3,773 features. 
+-I vectorised train speeches with this bespoke list of features. I used a training set (X, y) to prevent data leakage. We can not train and test features based on the same samples. Testing is supposed to be done on unseen data.
+- After  I split samples 80/20 with stratified sampling for keeping the same proportions 80/20 in each split. Also, I used random seed 26 to keep the same number of samples
+- The number of features is still too large, and I wanted to identify the most relevant features across the entire training sample, rather than per class. Because we will build a classifier based on 4 classes, not separately. I used the built-in method chi2 and predefined 50 features for cutting the number of parameters to the most relevant. This is supposed to reduce noise, avoid overfitting and speed up the training process.
+ - Then I used the received samples for training the Random Forest and SVM classifiers
+ Performance evaluation
+ As a part of the assignment, I am evaluating the performance of the classifiers using the classification report. Please see my findings:
+ - Imbalanced data. As we may see from the Support column, the dataset is imbalanced. I tried to handle this with the parameter class_weight="balanced", but still, we do not have enough samples for some classes
+ As an improvement, here we may use oversampling when we randomly copy the existing samples and fitting in the model. It will not be a syntactic data, but still, this solution is not ideal because less samples means we do not have all variety of patterns related to the class.
+- As we do not have enough samples, all measurements for the class Liberal democratic are poor. Definitely my bespoke tokeniser works better than the previous two, where we had zero or close to zero F1-score, precision and recall. Precision (how many predicted positives were correct) is less than 50% so it is worse than a random guess. The false positive error is high. The same applies to Recall (how many real positives were detected), which is also poor, indicating a high False negative error.
+- Best performance, similar to the previous two approaches, is achieved with the Conservative class. Here we may see the high precision, recall and a result f1 score. 
+We have numbers more than 0.71, which is not bad but worse than we have with the updated vectorizer when we used unigrams, bi-grams and trigrams and reached recall 0.93(RF) and 0.98(SVM) (means we found 93% and 98% of positive classes).
+- Mediocre performance, we got on the other two classes, Labour and Scottish National Party. The numbers are close to 0.50 , so it is fair to say that the model is close to guessing the result.
+ - In terms of accuracy, we can see the average total numbers that are spoiled with not that good numbers for other classes, then Conservative.
+ Ways to improve:
+ Try to add more samples using the oversampling approach to build a better dataset for testing. Use the random duplicates of the samples from the class, not synthetic data
+ - Try CV for evaluation with 5-fold. Especially considering  small-sized dataset I would go with CV evaluation when we divide the sample into 5 fold and retest the performance.
+
+
+
+
+
