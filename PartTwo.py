@@ -11,6 +11,7 @@ import numpy as np
 import spacy
 from collections import Counter, defaultdict
 
+
 nlp = spacy.load("en_core_web_sm")
 
 #loading data from csv file.The df is the source for our next tasks
@@ -67,7 +68,7 @@ def create_vectorizer(stop_words=None,max_features=None,ngram_range=(1,1),tokeni
     return vectorizer
 # Create a vectorizer using default parameters, except for omitting English stopwords and setting max_features to 3000.
 vectorizer = create_vectorizer(stop_words="english",max_features=3000)
-'''
+
 #2.Vectorize the speech column of the dataframe 
 X = vectorizer.fit_transform(df_prepared['speech'])
 #3.The goal of the assignment is to predict the political party, out target is column "party"
@@ -101,8 +102,8 @@ svm.fit(X_train, y_train)
 y_pred_svm = svm.predict(X_test)
 
 #3. I received a warning Precision is ill-defined and being set to 0.0 in labels with no predicted samples.Testing the training procedure
-print(np.unique(y_pred_random_f, return_counts=True))
-print(np.unique(y_pred_svm, return_counts=True))
+#print(np.unique(y_pred_random_f, return_counts=True))
+#print(np.unique(y_pred_svm, return_counts=True))
 
 #3.Print the scikit-learn macro-average f1 score and classification report for each classifier on the test set
 #I received good f1score (0.82 for RF and 0.87 for SVM) for Conservative class (where I have many samples). With Labour and Scottish National party the results are medium and with Liberal Democrat they are very poor,
@@ -141,7 +142,7 @@ y_pred_svm = svm.predict(X_test)
 print("Macro-average f1 score for Random forest with updated vectorizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with updated vectorizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with updated vectorizer:",f1_score(y_test,y_pred_svm,average="macro"))
-print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))'''
+print("Classification_report for SVM with updated vectorizer:\n", classification_report(y_test,y_pred_svm))
 
 #e
 #Ty to find more information about the speeches.I want to find out what can be the most frequent NERs and POS in the speaches per class, decided to go with spacy
@@ -173,7 +174,7 @@ for text,label in zip(X_train,y_train):
             pos_verb_counter[label][token.lemma_] += 1 
         elif token.pos_ == "ADJ":
             pos_adj_counter[label][token.lemma_] += 1
-#printing the results
+#printing the results for understading whether idea with NER and POS detectionw worth a try
 
 '''top_n = 500
 
@@ -205,8 +206,6 @@ for label in pos_adj_counter:
 
  #Collecting all features, using set in order to avopid dublicates
 all_features = set()
-
-
 for label in ner_org_counter:
     for org in ner_org_counter[label]:
         all_features.add(f"ORG:{org}")
@@ -246,7 +245,7 @@ def bespoke_tokenizer(text):
 for text,label in zip(X_train,y_train):
     doc = nlp(text)
 
-print("Total feature form custom tokeniser", len(all_features))
+#print("Total feature form custom tokeniser", len(all_features))
  
  #Feeding Tfidvectorizer with a custom tokenizer
 vectorizer_bespoke = create_vectorizer(ngram_range=(1,1),tokenizer=bespoke_tokenizer, lowercase=False, vocabulary=all_features,  max_features=3000)
@@ -269,12 +268,14 @@ random_f= RandomForestClassifier(n_estimators=300, class_weight="balanced", rand
 random_f.fit(X_train_sel,y_train)
 y_pred_random_f = random_f.predict(X_test_sel)
   
-#2.Train SVM with linear kernel
+#Train SVM with linear kernel
 
 svm = SVC(kernel='linear', class_weight="balanced", random_state=26)
 svm.fit(X_train_sel, y_train)
 y_pred_svm = svm.predict(X_test_sel)
 
+
+#Evaluating 2 classifiers 
 print("Macro-average f1 score for Random forest with custom tokenizer:", f1_score(y_test,y_pred_random_f,average="macro"))
 print("Classification_report for Random forest with custom tokenizer:\n", classification_report(y_test,y_pred_random_f))
 print("Macro-average f1 score for SVM with custom tokenizer:",f1_score(y_test,y_pred_svm,average="macro"))

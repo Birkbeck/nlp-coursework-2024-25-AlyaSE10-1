@@ -134,16 +134,9 @@ def get_ttrs(df):
 
 def get_fks(df):
     """helper function to add fk scores to a dataframe"""
-    #results = {}
-    #fks_grade = []
-    cmudict = nltk.corpus.cmudict.dict()
-    #for i, row in df.iterrows():
-        #results[row["title"]] = round(fk_level(row["text"], cmudict), 4)
-        #title = row["title"]
-        #fks = round(fk_level(row["text"], cmudict), 4)
-        #fks_grade.append(fks) 
-    df["fks"] = df["text"].apply(lambda text: round(fk_level(text, cmudict), 4))
     
+    cmudict = nltk.corpus.cmudict.dict()
+    df["fks"] = df["text"].apply(lambda text: round(fk_level(text, cmudict), 4))
     return df
 
 
@@ -188,7 +181,8 @@ def subjects_by_verb_pmi(doc, target_verb):
                     #print(sub_ind_counter)
 
 
-    #Computing probabilities. I decided to use cooccurance (pair counter) in order to focus on measurement how strong subject and verb are associated. I also could use the whole corpus (cleaned one) as we have in Jurafsky, chapter 6 but this approach will use many itrelevant tokens so I chose pairs 
+    #Computing probabilities. I decided to use cooccurance (pair counter) in order to focus on measurement how strong subject and verb are associated.
+    #  I also could use the whole corpus (cleaned one) as we have in Jurafsky, chapter 6 but this approach will use many itrelevant tokens so I chose pairs 
     pmi_scores = {}
     if pair_counter == 0 or verb_ind_counter == 0:
         return []
@@ -208,18 +202,13 @@ def subjects_by_verb_pmi(doc, target_verb):
     #print(sorted_subj_pmi[:10])
 
     '''In the test 2 novels (A_Tale_of_Two_Cities, Blood_Meridian) we receive negative PMI this means that subject appear independently more frequently then together.
-   List from function subject_by_verb_count should is different from the generated list from this functions. Some subjects are frequently appeared - 
+   List from function subject_by_verb_count is different from the generated list from this functions. Some subjects are frequently appeared - 
    these are I, he, you, she etc, they are generally used. They PMI is dramatically dropping because they are used without verb more frequently. As a result the "leaders" 
    in PMI are less general words
-   For example word "nobody" in Blood Meridian is the last by frequency in the top10 because it is not that general but it is the leader by PMI because it stronger associated with verb "hear" we have it not that often like "he" - leader in frequency for this novel''' 
+   For example word "nobody" in Blood Meridian is the last by frequency in the top10 because it is not that general but it is the leader by PMI because it stronger 
+   associated with verb "hear" we have it not that often like "he" - leader in frequency for this novel''' 
     return [subject for subject, count in sorted_subj_pmi[:10]]
         
-
-
-
-
-
-
 def subjects_by_verb_count(doc, verb):
     """Extracts the most common subjects of a given verb in a parsed document. Returns a list.
     We are searchning nominal subjects("smbd hears")   and passive nominal subject ("hear smth") """
@@ -241,9 +230,7 @@ def subjects_by_verb_count(doc, verb):
     #results
     return [subject for subject, count in sorted_subjects[:10]]
 
-                    
-
-
+                
 def syntactic_objects(doc):
     """Extracts the most common adjectives in a parsed document. Returns a list of tuples."""
     
@@ -269,9 +256,6 @@ def syntactic_objects(doc):
     #for title, deps in  title_syn_obj():
     #   print(f"{title}:{deps}")
 
-
-
-
 if __name__ == "__main__":
     """
     uncomment the following lines to run the functions once you have completed them
@@ -279,15 +263,13 @@ if __name__ == "__main__":
     path = Path.cwd() / "p1-texts" / "novels" #(/Users/alinasysko/BBK/NLP/Coursework/p1-texts/novels") 
     #print(path)
     df = read_novels(path) # this line will fail until you have completed the read_novels function above.
-    #print(df.head())
+    print(df.head())
     nltk.download("cmudict")
     parse(df)
-    #print(df.head())
-    #print(nltk_ttr(df)) #Alina
-    #print(get_ttrs(df))
-    #print(get_fks(df))
+    print(df.head())
+    print(get_ttrs(df))
+    print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
-    #print(adjective_counts(df))
     
     for i, row in df.iterrows():
         print(row["title"])
@@ -299,9 +281,9 @@ if __name__ == "__main__":
         print(subjects_by_verb_pmi(row["parsed"], "hear"))
         print("\n")
 
-    '''for i, row in df.iterrows():
+    for i, row in df.iterrows():
         print(row["title"])
         print(syntactic_objects(row["parsed"]))
-        print("\n")'''
+        print("\n")
 
 
