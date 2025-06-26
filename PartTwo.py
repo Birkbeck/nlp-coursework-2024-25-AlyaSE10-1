@@ -260,7 +260,8 @@ X_train, X_test, y_train, y_test = train_test_split(X_bespoke,y,test_size=0.2,st
 
 #Feature selection for noise reduction and preventing overfiting
 selector = SelectKBest(chi2, k=50)
-X_train_sel = selector.fit.transform(X_train,y_train)
+selector.fit(X_train,y_train)
+X_train_sel = selector.transform(X_train)
 X_test_sel = selector.transform(X_test) 
 
 #Train Random forest

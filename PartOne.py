@@ -40,7 +40,6 @@ def fk_level(text, d):
     total_syllables = sum (count_syl(token,d) for token in tokens_cleaned) 
     fk_grade = 0.39 * (total_words/total_sentences) + 11.8 * (total_syllables/total_words) - 15.59
     return fk_grade
-    #pass
 
 
 def count_syl(word, d):
@@ -80,7 +79,7 @@ def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
         #print(file)
         #exit()
         title, author, year = file.stem.split("-")
-        #print(title)
+        
         text = file.read_text(encoding="utf-8")
         text_polished = text.replace('\n',' ')
         data.append({
@@ -91,9 +90,7 @@ def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
     df = pd.DataFrame(data)
     df = df.sort_values(by="year").reset_index(drop=True)
     return df
-#a = read_novels()
-#print(a)
-   # pass
+
 
 
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
@@ -118,16 +115,11 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
 def nltk_ttr(text):
     """Calculates the type-token ratio of a text. Text is tokenized using nltk.word_tokenize."""
     tokens = []
-    tokens.extend(nltk.word_tokenize(text))
-        #print(tokens)
-    #punct_symbols = PunktLanguageVars()
-    #punct_symbols_l = punct_symbols.punct_chars
+    tokens.extend(nltk.word_tokenize(text)) 
     tokens_cleaned = [token.lower() for token in tokens if token.isalnum()]
-    #return tokens_cleaned
     ttr = len(set(tokens_cleaned)) / len(tokens_cleaned)
     return ttr
-#print(a)
-   #pass
+
 
 
 def get_ttrs(df):
