@@ -15,7 +15,7 @@ from collections import Counter, defaultdict
 nlp = spacy.load("en_core_web_sm")
 
 #loading data from csv file.The df is the source for our next tasks
-with open("p2-texts /hansard40000.csv", mode="r",encoding='utf-8') as file:
+with open("p2-texts/hansard40000.csv", mode="r",encoding='utf-8') as file:
     df=pd.read_csv(file,header=0)
 
 #a(i) Data preprocessing
